@@ -36,6 +36,16 @@ If you use this dataset in your research, please cite the following paper:
       primaryClass={cs.LG},
       url={https://arxiv.org/abs/2503.23766}, 
 }
+
+@misc{lam2025cyclechemistdualprongedmachinelearning,
+      title={CycleChemist: A Dual-Pronged Machine Learning Framework for Organic Photovoltaic Discovery}, 
+      author={Hou Hei Lam and Jiangjie Qiu and Xiuyuan Hu and Wentao Li and Fankun Zeng and Siwei Fu and Hao Zhang and Xiaonan Wang},
+      year={2025},
+      eprint={2511.19500},
+      archivePrefix={arXiv},
+      primaryClass={cond-mat.mtrl-sci},
+      url={https://arxiv.org/abs/2511.19500}, 
+}
 ```
 And cite the original data sources:
 
