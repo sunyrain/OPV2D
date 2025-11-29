@@ -1,4 +1,5 @@
 # OPV Dataset: Organic Photovoltaic Donor-Acceptor Dataset (OPV2D)
+<img width="2816" height="1536" alt="a0ac3c4804f0987ad77605860664b08a" src="https://github.com/user-attachments/assets/ea0c7a09-e61b-4efd-b83a-d182e130c92b" />
 
 ## Overview
 
@@ -10,8 +11,6 @@ The dataset is stored in a single real-time database:
   Each entry is annotated with a `checked` field indicating whether it has been manually validated.
 
 This design allows the dataset to grow organically while maintaining transparent data quality tracking.
-
----
 
 ## Usage
 
