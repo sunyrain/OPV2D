@@ -1,14 +1,18 @@
 # OPV Dataset: Organic Photovoltaic Donor-Acceptor Dataset (OPV2D)
 <img width="2816" height="1536" alt="a0ac3c4804f0987ad77605860664b08a" src="https://github.com/user-attachments/assets/ea0c7a09-e61b-4efd-b83a-d182e130c92b" />
 
+> **🌐 Online Database Browser:** [https://sunyrain.github.io/OPV2D/](https://sunyrain.github.io/OPV2D/)
+>
+> Search, filter, and download the full dataset interactively — no installation required.
+
 ## Overview
 
 This repository hosts **OPV2D**, a continuously updated dataset for organic photovoltaic (OPV) donor–acceptor (D/A) materials. The dataset integrates previously published OPV datasets and expands them through ongoing manual verification and new data collection. It is designed to support machine learning research, molecular generation, and large-scale OPV screening.
 
-The dataset is stored in a single real-time database:
+The dataset is available in two formats:
 
-* **Active_Database.csv** — Contains all collected data.
-  Each entry is annotated with a `checked` field indicating whether it has been manually validated.
+* **Active_Database.csv** — The full dataset in CSV format. Each entry is annotated with a `checked` field indicating whether it has been manually validated.
+* **[Online Browser](https://sunyrain.github.io/OPV2D/)** — An interactive web interface hosted via GitHub Pages (`docs/` folder), supporting search, filtering, sorting, and CSV/JSON export.
 
 This design allows the dataset to grow organically while maintaining transparent data quality tracking.
 
