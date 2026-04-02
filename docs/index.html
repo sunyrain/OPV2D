@@ -34,18 +34,20 @@
 
     /* ── Header ─────────────────────────── */
     .site-header {
-      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-      color: #fff; padding: 40px 24px 32px; text-align: center;
+      background: linear-gradient(135deg, #312e81 0%, #4f46e5 50%, #7c3aed 100%);
+      color: #fff; padding: 44px 24px 36px; text-align: center;
     }
-    .site-header h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
-    .site-header .subtitle { font-size: 14px; opacity: 0.85; max-width: 600px; margin: 0 auto; }
-    .site-header .links { margin-top: 16px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .site-header h1 { font-size: 30px; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.3px; }
+    .site-header .subtitle { font-size: 14px; opacity: 0.85; max-width: 640px; margin: 0 auto; line-height: 1.7; }
+    .site-header .subtitle a { color: #c7d2fe; text-decoration: underline; text-underline-offset: 2px; }
+    .site-header .subtitle a:hover { color: #fff; }
+    .site-header .links { margin-top: 18px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
     .site-header .links a {
-      color: rgba(255,255,255,0.9); text-decoration: none; font-size: 12px;
-      padding: 5px 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px;
-      transition: .2s;
+      color: rgba(255,255,255,0.92); text-decoration: none; font-size: 12px; font-weight: 500;
+      padding: 6px 16px; border: 1px solid rgba(255,255,255,0.25); border-radius: 20px;
+      backdrop-filter: blur(4px); background: rgba(255,255,255,0.08); transition: .2s;
     }
-    .site-header .links a:hover { background: rgba(255,255,255,0.15); }
+    .site-header .links a:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5); }
     .container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
 
     /* ── KPI Stats ──────────────────────── */
@@ -85,8 +87,8 @@
     }
     .btn-primary { background: var(--blue); color: #fff; }
     .btn-primary:hover { background: #4f46e5; }
-    .btn-accent { background: var(--green); color: #111; font-weight: 600; font-size: .82rem; }
-    .btn-accent:hover { background: #16a34a; color: #fff; }
+    .btn-accent { background: var(--green); color: #fff; font-weight: 600; font-size: .82rem; border-radius: 20px; padding: 7px 18px; }
+    .btn-accent:hover { background: #059669; }
     .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
     .btn-ghost:hover { background: var(--bg-hover); }
     .toolbar .spacer { flex: 1; }
@@ -109,11 +111,19 @@
 
     /* ── Citation Bar ───────────────────── */
     .citation-bar {
-      max-width: 1200px; margin: 0 auto; padding: 10px 24px;
-      background: var(--bg-card); border-bottom: 1px solid var(--border);
-      font-size: .82rem; color: var(--text-muted); line-height: 1.6;
+      max-width: 1400px; margin: 0 auto; padding: 14px 24px;
+      background: linear-gradient(90deg, #eef2ff 0%, #f5f3ff 100%);
+      border-bottom: 1px solid #ddd6fe;
+      font-size: .82rem; color: var(--text-muted); line-height: 1.7;
     }
-    .citation-bar a { color: var(--blue); text-decoration: none; }
+    .citation-bar .cite-title { font-weight: 700; color: var(--blue); margin-bottom: 4px; font-size: .85rem; }
+    .citation-bar .cite-item { display: flex; gap: 6px; align-items: baseline; padding: 1px 0; }
+    .citation-bar .cite-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%; background: var(--blue); color: #fff;
+      font-size: 10px; font-weight: 700; flex-shrink: 0;
+    }
+    .citation-bar a { color: var(--blue); text-decoration: none; font-weight: 500; }
     .citation-bar a:hover { text-decoration: underline; }
 
     /* ── Data Table ─────────────────────── */
@@ -205,6 +215,7 @@
     @media (max-width: 768px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
       .site-header h1 { font-size: 22px; }
+      .citation-bar { font-size: .78rem; padding: 12px 16px; }
     }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg-page); }
@@ -216,8 +227,7 @@
 <!-- ═══════ HEADER ═══════ -->
 <header class="site-header">
   <h1>⚡ OPV Performance Database</h1>
-  <p class="subtitle">A curated dataset of organic photovoltaic device performance parameters extracted from scientific literature using AI-assisted data mining.<br>
-  Part of the <a href="https://github.com/sunyrain/OPV2D" target="_blank" style="color:var(--blue)">OPV2D</a> project.</p>
+  <p class="subtitle">A curated dataset of organic photovoltaic device performance parameters extracted from scientific literature via AI-assisted data mining. Part of the <a href="https://github.com/sunyrain/OPV2D" target="_blank">OPV2D</a> project.</p>
   <div class="links">
     <a href="https://github.com/sunyrain/OPV2D" target="_blank">📂 GitHub</a>
     <a href="#" id="downloadAllCsvBtn">📤 Download All CSV</a>
@@ -227,9 +237,15 @@
 
 <!-- ═══════ CITATION ═══════ -->
 <div class="citation-bar">
-  <span>📝 <strong>Citation:</strong></span>
-  Qiu et al., <em>Accelerating High-Efficiency OPV Discovery via Pretrained GNNs and Generative RL</em>, <a href="https://arxiv.org/abs/2503.23766" target="_blank">arXiv:2503.23766</a>, 2025 &nbsp;|&nbsp;
-  Lam et al., <em>CycleChemist: A Dual-Pronged ML Framework for OPV Discovery</em>, <a href="https://arxiv.org/abs/2511.19500" target="_blank">arXiv:2511.19500</a>, 2025
+  <div class="cite-title">📝 If you use this dataset, please cite:</div>
+  <div class="cite-item">
+    <span class="cite-num">1</span>
+    <span>Qiu et al., <em>Accelerating High-Efficiency Organic Photovoltaic Discovery via Pretrained Graph Neural Networks and Generative Reinforcement Learning</em>, <a href="https://arxiv.org/abs/2503.23766" target="_blank">arXiv:2503.23766</a>, 2025</span>
+  </div>
+  <div class="cite-item">
+    <span class="cite-num">2</span>
+    <span>Lam et al., <em>CycleChemist: A Dual-Pronged Machine Learning Framework for Organic Photovoltaic Discovery</em>, <a href="https://arxiv.org/abs/2511.19500" target="_blank">arXiv:2511.19500</a>, 2025</span>
+  </div>
 </div>
 
 <div class="container">
