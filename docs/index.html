@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OPV Performance Database</title>
+  <style>
+    :root {
+      --bg-page: #f8f9fb;
+      --bg-card: #ffffff;
+      --bg-hover: #f1f3f9;
+      --border: #e2e5ed;
+      --text: #1a1d28;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+      --green: #10b981;
+      --green-bg: #ecfdf5;
+      --red: #ef4444;
+      --blue: #6366f1;
+      --blue-bg: #eef2ff;
+      --amber: #f59e0b;
+      --cyan: #06b6d4;
+      --purple: #a855f7;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg-page); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+      line-height: 1.6; min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────── */
+    .site-header {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: #fff; padding: 40px 24px 32px; text-align: center;
+    }
+    .site-header h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+    .site-header .subtitle { font-size: 14px; opacity: 0.85; max-width: 600px; margin: 0 auto; }
+    .site-header .links { margin-top: 16px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .site-header .links a {
+      color: rgba(255,255,255,0.9); text-decoration: none; font-size: 12px;
+      padding: 5px 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px;
+      transition: .2s;
+    }
+    .site-header .links a:hover { background: rgba(255,255,255,0.15); }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
+
+    /* ── KPI Stats ──────────────────────── */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 14px; margin-bottom: 22px;
+    }
+    .stat-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px; text-align: center;
+      box-shadow: var(--shadow); border-top: 3px solid var(--blue);
+    }
+    .stat-card .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+    .stat-card .value { font-size: 26px; font-weight: 700; color: var(--blue); }
+    .stat-card .sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+    .stat-card.green { border-top-color: var(--green); }
+    .stat-card.green .value { color: var(--green); }
+    .stat-card.amber { border-top-color: var(--amber); }
+    .stat-card.amber .value { color: var(--amber); }
+    .stat-card.cyan { border-top-color: var(--cyan); }
+    .stat-card.cyan .value { color: var(--cyan); }
+
+    /* ── Toolbar ────────────────────────── */
+    .toolbar {
+      display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
+    }
+    .toolbar input[type="text"] {
+      padding: 7px 14px; border: 1px solid var(--border); border-radius: 8px;
+      font-size: 13px; background: var(--bg-card); outline: none;
+      min-width: 280px; transition: border-color .2s;
+    }
+    .toolbar input[type="text"]:focus { border-color: var(--blue); }
+    .btn {
+      padding: 7px 16px; border: none; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all .2s; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { background: #4f46e5; }
+    .btn-accent { background: var(--green); color: #111; font-weight: 600; font-size: .82rem; }
+    .btn-accent:hover { background: #16a34a; color: #fff; }
+    .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--bg-hover); }
+    .toolbar .spacer { flex: 1; }
+    .toolbar .info { font-size: 12px; color: var(--text-dim); }
+
+    /* ── Filter Bar ────────────────────── */
+    .filter-bar {
+      display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;
+      padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+    .filter-bar label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; }
+    .filter-bar select, .filter-bar input[type="number"] {
+      padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px;
+      font-size: 12px; background: var(--bg-page); outline: none; min-width: 90px;
+    }
+    .filter-bar select:focus, .filter-bar input[type="number"]:focus { border-color: var(--blue); }
+    .filter-group { display: flex; flex-direction: column; gap: 2px; }
+    .filter-sep { width: 1px; height: 32px; background: var(--border); margin: 0 4px; }
+
+    /* ── Top Donors/Acceptors ───────────── */
+    .top-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px; }
+    .top-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow);
+    }
+    .top-card h3 { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; }
+    .top-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 0; border-bottom: 1px solid var(--border); font-size: 12px;
+    }
+    .top-item:last-child { border-bottom: none; }
+    .top-item .name { color: var(--text); font-weight: 500; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .top-item .count { color: var(--blue); font-weight: 700; }
+
+    /* ── Data Table ─────────────────────── */
+    .table-wrap {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      overflow-x: auto; margin-bottom: 20px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
+    table th {
+      text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--border);
+      color: var(--text-muted); font-weight: 600; font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      position: sticky; top: 0; background: var(--bg-card); z-index: 1;
+      cursor: pointer; user-select: none;
+    }
+    table th:hover { color: var(--blue); }
+    table th .sort-arrow { font-size: 10px; margin-left: 3px; }
+    table td {
+      padding: 7px 12px; border-bottom: 1px solid var(--border);
+      max-width: 200px; overflow: hidden; text-overflow: ellipsis;
+    }
+    table tr:hover td { background: var(--bg-hover); }
+    table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    table td.doi { color: var(--blue); max-width: 180px; }
+    table tr { cursor: pointer; }
+
+    /* ── Pagination ─────────────────────── */
+    .pagination {
+      display: flex; justify-content: center; align-items: center;
+      gap: 8px; padding: 16px 0;
+    }
+    .pagination button {
+      padding: 5px 14px; border: 1px solid var(--border); border-radius: 6px;
+      background: var(--bg-card); color: var(--text-muted); cursor: pointer;
+      font-size: 12px; transition: all .2s;
+    }
+    .pagination button:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .pagination button:disabled { opacity: .4; cursor: not-allowed; }
+    .pagination button.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .pagination .page-info { font-size: 12px; color: var(--text-dim); }
+
+    /* ── Detail Modal ─────────────────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      z-index: 900; align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--bg-card); border-radius: var(--radius);
+      box-shadow: var(--shadow-lg); width: 720px; max-width: 92vw;
+      max-height: 85vh; overflow-y: auto;
+    }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 24px; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: var(--bg-card); z-index: 1;
+    }
+    .modal-header h2 { font-size: 16px; font-weight: 700; }
+    .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px 8px; }
+    .modal-close:hover { color: var(--red); }
+    .modal-body { padding: 20px 24px; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .detail-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .detail-item:nth-child(odd) { padding-right: 16px; }
+    .detail-item:nth-child(even) { padding-left: 16px; border-left: 1px solid var(--border); }
+    .detail-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; margin-bottom: 2px; }
+    .detail-value { font-size: 13px; font-weight: 500; word-break: break-all; }
+    .detail-section { font-size: 13px; font-weight: 700; color: var(--blue); padding: 12px 0 6px; border-bottom: 2px solid var(--blue); grid-column: 1 / -1; margin-top: 8px; }
+
+    /* ── Footer ────────────────────────── */
+    .site-footer {
+      text-align: center; padding: 24px; font-size: 12px; color: var(--text-dim);
+      border-top: 1px solid var(--border); margin-top: 40px;
+    }
+    .site-footer a { color: var(--blue); text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
+
+    /* ── Loading ────────────────────────── */
+    .loading { text-align: center; padding: 60px; color: var(--text-dim); font-size: 14px; }
+    .loading .spinner {
+      display: inline-block; width: 32px; height: 32px;
+      border: 3px solid var(--border); border-top-color: var(--blue);
+      border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* responsive */
+    @media (max-width: 960px) { .top-row { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .site-header h1 { font-size: 22px; }
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-page); }
+    ::-webkit-scrollbar-thumb { background: #c8cdd5; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════ HEADER ═══════ -->
+<header class="site-header">
+  <h1>⚡ OPV Performance Database</h1>
+  <p class="subtitle">A curated dataset of organic photovoltaic device performance parameters extracted from scientific literature using AI-assisted data mining.<br>
+  Part of the <a href="https://github.com/sunyrain/OPV2D" target="_blank" style="color:var(--blue)">OPV2D</a> project.</p>
+  <div class="links">
+    <a href="https://github.com/sunyrain/OPV2D" target="_blank">📂 GitHub</a>
+    <a href="#" id="downloadAllCsvBtn">📤 Download All CSV</a>
+    <a href="#" id="downloadAllJsonBtn">📦 Download All JSON</a>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- ═══════ LOADING ═══════ -->
+<div class="loading" id="loadingPanel">
+  <div class="spinner"></div>
+  <div>Loading database…</div>
+</div>
+
+<!-- ═══════ MAIN CONTENT (hidden until loaded) ═══════ -->
+<div id="mainContent" style="display:none">
+
+<!-- ═══════ STATS ═══════ -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="label">Total Records</div>
+    <div class="value" id="statTotal">—</div>
+  </div>
+  <div class="stat-card cyan">
+    <div class="label">Publications (DOIs)</div>
+    <div class="value" id="statDois">—</div>
+  </div>
+  <div class="stat-card green">
+    <div class="label">Verified</div>
+    <div class="value" id="statVerified">—</div>
+    <div class="sub" id="statVerifiedRate"></div>
+  </div>
+  <div class="stat-card amber">
+    <div class="label">Avg PCE</div>
+    <div class="value" id="statAvgPce">—</div>
+    <div class="sub" id="statMaxPce"></div>
+  </div>
+</div>
+
+<!-- ═══════ TOP DONORS / ACCEPTORS ═══════ -->
+<div class="top-row">
+  <div class="top-card">
+    <h3>🏆 Top Donors</h3>
+    <div id="topDonors"></div>
+  </div>
+  <div class="top-card">
+    <h3>🏆 Top Acceptors</h3>
+    <div id="topAcceptors"></div>
+  </div>
+</div>
+
+<!-- ═══════ TOOLBAR ═══════ -->
+<div class="toolbar">
+  <input type="text" id="searchInput" placeholder="Search DOI / Donor / Acceptor …" onkeydown="if(event.key==='Enter')applyFilters()">
+  <button class="btn btn-primary" onclick="applyFilters()">🔍 Search</button>
+  <button class="btn btn-ghost" onclick="clearFilters()">Clear</button>
+  <span class="spacer"></span>
+  <button class="btn btn-accent" id="downloadFilteredCsvBtn" style="display:none" onclick="downloadFilteredCSV()">📤 Export CSV</button>
+  <button class="btn btn-accent" id="downloadFilteredJsonBtn" style="display:none" onclick="downloadFilteredJSON()">📦 Export JSON</button>
+  <span class="info" id="tableInfo">—</span>
+</div>
+
+<!-- ═══════ FILTERS ═══════ -->
+<div class="filter-bar">
+  <div class="filter-group">
+    <label>Verified</label>
+    <select id="filterVerified" onchange="applyFilters()">
+      <option value="">All</option>
+      <option value="YES">Verified</option>
+      <option value="NO">Unverified</option>
+    </select>
+  </div>
+  <div class="filter-sep"></div>
+  <div class="filter-group">
+    <label>PCE Min</label>
+    <input type="number" id="filterPceMin" step="0.1" min="0" placeholder="—" style="width:70px" onchange="applyFilters()">
+  </div>
+  <div class="filter-group">
+    <label>PCE Max</label>
+    <input type="number" id="filterPceMax" step="0.1" min="0" placeholder="—" style="width:70px" onchange="applyFilters()">
+  </div>
+  <div class="filter-sep"></div>
+  <div class="filter-group">
+    <label>Has SMILES</label>
+    <select id="filterSmiles" onchange="applyFilters()">
+      <option value="">All</option>
+      <option value="1">Yes</option>
+      <option value="0">No</option>
+    </select>
+  </div>
+  <div class="filter-sep"></div>
+  <div class="filter-group">
+    <label>Core Complete</label>
+    <select id="filterCoreComplete" onchange="applyFilters()">
+      <option value="">All</option>
+      <option value="1">Complete</option>
+      <option value="0">Incomplete</option>
+    </select>
+  </div>
+</div>
+
+<!-- ═══════ TABLE ═══════ -->
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th onclick="sortBy('verified')">Verified <span class="sort-arrow" id="sort-verified"></span></th>
+        <th onclick="sortBy('doi')">DOI <span class="sort-arrow" id="sort-doi"></span></th>
+        <th onclick="sortBy('donor')">Donor <span class="sort-arrow" id="sort-donor"></span></th>
+        <th onclick="sortBy('acceptor')">Acceptor <span class="sort-arrow" id="sort-acceptor"></span></th>
+        <th onclick="sortBy('d_a_ratio')">D:A <span class="sort-arrow" id="sort-d_a_ratio"></span></th>
+        <th onclick="sortBy('voc')">Voc <span class="sort-arrow" id="sort-voc"></span></th>
+        <th onclick="sortBy('jsc')">Jsc <span class="sort-arrow" id="sort-jsc"></span></th>
+        <th onclick="sortBy('ff')">FF <span class="sort-arrow" id="sort-ff"></span></th>
+        <th onclick="sortBy('pce')">PCE <span class="sort-arrow" id="sort-pce"></span></th>
+        <th onclick="sortBy('additive')">Additive <span class="sort-arrow" id="sort-additive"></span></th>
+        <th onclick="sortBy('device_structure')">Device <span class="sort-arrow" id="sort-device_structure"></span></th>
+      </tr>
+    </thead>
+    <tbody id="dataBody"></tbody>
+  </table>
+</div>
+<div class="pagination" id="pagination"></div>
+
+</div><!-- mainContent -->
+</div><!-- container -->
+
+<!-- ═══════ DETAIL MODAL ═══════ -->
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeDetail()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="detailTitle">Record Detail</h2>
+      <button class="modal-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer class="site-footer">
+  <p>OPV Performance Database &mdash; Part of <a href="https://github.com/sunyrain/OPV2D" target="_blank">OPV2D</a> &middot; Data extracted via <a href="https://github.com/sunyrain/Literature-Datamining" target="_blank">Literature-Datamining</a></p>
+  <p style="margin-top:6px;font-size:.82rem;color:var(--text-dim);line-height:1.5">
+    If you use this dataset, please cite:<br>
+    Qiu et al., <em>Accelerating High-Efficiency OPV Discovery via Pretrained GNNs and Generative RL</em>, <a href="https://arxiv.org/abs/2503.23766" target="_blank" style="color:var(--blue)">arXiv:2503.23766</a>, 2025<br>
+    Lam et al., <em>CycleChemist: A Dual-Pronged ML Framework for OPV Discovery</em>, <a href="https://arxiv.org/abs/2511.19500" target="_blank" style="color:var(--blue)">arXiv:2511.19500</a>, 2025
+  </p>
+  <p style="margin-top:4px">Last updated: <span id="lastUpdated">—</span></p>
+</footer>
+
+<script>
+/* ══════════════════════════════════════
+   State
+   ══════════════════════════════════════ */
+let allData = [];
+let filtered = [];
+let currentPage = 1;
+const perPage = 100;
+let sortKey = 'pce';
+let sortAsc = false;
+
+/* ══════════════════════════════════════
+   Utility
+   ══════════════════════════════════════ */
+function esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
+function short(s, n) { s = s || ''; return s.length > n ? s.slice(0, n) + '…' : s; }
+function fmtNum(v) { return v != null && v !== '' ? Number(v).toFixed(2) : '—'; }
+
+/* ══════════════════════════════════════
+   Load Data
+   ══════════════════════════════════════ */
+async function loadData() {
+  try {
+    const resp = await fetch('opv_data.json');
+    allData = await resp.json();
+    document.getElementById('loadingPanel').style.display = 'none';
+    document.getElementById('mainContent').style.display = '';
+    computeStats();
+    applyFilters();
+
+    // Last updated from HTTP header
+    const lastMod = resp.headers.get('Last-Modified');
+    if (lastMod) document.getElementById('lastUpdated').textContent = new Date(lastMod).toLocaleDateString();
+  } catch(e) {
+    document.getElementById('loadingPanel').innerHTML = '<div style="color:var(--red)">Failed to load data: ' + e.message + '</div>';
+  }
+}
+
+/* ══════════════════════════════════════
+   Stats
+   ══════════════════════════════════════ */
+function computeStats() {
+  const total = allData.length;
+  const dois = new Set(allData.map(r => r.doi)).size;
+  const verified = allData.filter(r => r.verified === 'YES').length;
+  const pces = allData.map(r => r.pce).filter(v => v != null && v > 0);
+  const avgPce = pces.length ? (pces.reduce((a,b) => a+b, 0) / pces.length) : 0;
+  const maxPce = pces.length ? Math.max(...pces) : 0;
+
+  document.getElementById('statTotal').textContent = total.toLocaleString();
+  document.getElementById('statDois').textContent = dois.toLocaleString();
+  document.getElementById('statVerified').textContent = verified.toLocaleString();
+  document.getElementById('statVerifiedRate').textContent = total ? (verified/total*100).toFixed(1) + '% verified' : '';
+  document.getElementById('statAvgPce').textContent = avgPce.toFixed(2) + '%';
+  document.getElementById('statMaxPce').textContent = 'Max ' + maxPce.toFixed(2) + '%';
+
+  // Top donors / acceptors
+  renderTopList('topDonors', 'donor');
+  renderTopList('topAcceptors', 'acceptor');
+}
+
+function renderTopList(elId, field) {
+  const counts = {};
+  allData.forEach(r => {
+    const v = (r[field] || '').trim();
+    if (v) counts[v] = (counts[v] || 0) + 1;
+  });
+  const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 10);
+  document.getElementById(elId).innerHTML = sorted.map(([name, count]) =>
+    '<div class="top-item"><span class="name" title="' + esc(name) + '">' + esc(short(name, 30)) + '</span><span class="count">' + count + '</span></div>'
+  ).join('');
+}
+
+/* ══════════════════════════════════════
+   Filter & Sort
+   ══════════════════════════════════════ */
+function applyFilters() {
+  const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+  const vf = document.getElementById('filterVerified').value;
+  const pMin = parseFloat(document.getElementById('filterPceMin').value);
+  const pMax = parseFloat(document.getElementById('filterPceMax').value);
+  const smiles = document.getElementById('filterSmiles').value;
+  const coreComp = document.getElementById('filterCoreComplete').value;
+
+  filtered = allData.filter(r => {
+    if (search && !(r.doi||'').toLowerCase().includes(search) && !(r.donor||'').toLowerCase().includes(search) && !(r.acceptor||'').toLowerCase().includes(search)) return false;
+    if (vf === 'YES' && r.verified !== 'YES') return false;
+    if (vf === 'NO' && r.verified === 'YES') return false;
+    if (!isNaN(pMin) && (r.pce == null || r.pce < pMin)) return false;
+    if (!isNaN(pMax) && (r.pce == null || r.pce > pMax)) return false;
+    if (smiles === '1' && !r.donor_smiles && !r.acceptor_smiles) return false;
+    if (smiles === '0' && (r.donor_smiles || r.acceptor_smiles)) return false;
+    if (coreComp === '1' && (!r.donor || !r.acceptor || r.voc == null || r.jsc == null || r.ff == null || r.pce == null)) return false;
+    if (coreComp === '0' && r.donor && r.acceptor && r.voc != null && r.jsc != null && r.ff != null && r.pce != null) return false;
+    return true;
+  });
+
+  doSort();
+  currentPage = 1;
+  renderTable();
+  updateFilteredDownloadBtns();
+}
+
+function clearFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterVerified').value = '';
+  document.getElementById('filterPceMin').value = '';
+  document.getElementById('filterPceMax').value = '';
+  document.getElementById('filterSmiles').value = '';
+  document.getElementById('filterCoreComplete').value = '';
+  applyFilters();
+}
+
+function sortBy(key) {
+  if (sortKey === key) { sortAsc = !sortAsc; } else { sortKey = key; sortAsc = key === 'doi' || key === 'donor' || key === 'acceptor'; }
+  doSort();
+  renderTable();
+}
+
+function doSort() {
+  // Update arrows
+  document.querySelectorAll('.sort-arrow').forEach(el => el.textContent = '');
+  const arrow = document.getElementById('sort-' + sortKey);
+  if (arrow) arrow.textContent = sortAsc ? '▲' : '▼';
+
+  filtered.sort((a, b) => {
+    let va = a[sortKey], vb = b[sortKey];
+    if (va == null) va = sortAsc ? Infinity : -Infinity;
+    if (vb == null) vb = sortAsc ? Infinity : -Infinity;
+    if (typeof va === 'string') { va = va.toLowerCase(); vb = (vb || '').toLowerCase(); }
+    if (va < vb) return sortAsc ? -1 : 1;
+    if (va > vb) return sortAsc ? 1 : -1;
+    return 0;
+  });
+}
+
+/* ══════════════════════════════════════
+   Render Table
+   ══════════════════════════════════════ */
+function renderTable() {
+  const start = (currentPage - 1) * perPage;
+  const pageData = filtered.slice(start, start + perPage);
+
+  document.getElementById('tableInfo').textContent =
+    filtered.length === allData.length
+      ? filtered.length.toLocaleString() + ' records'
+      : filtered.length.toLocaleString() + ' / ' + allData.length.toLocaleString() + ' records';
+
+  const tbody = document.getElementById('dataBody');
+  tbody.innerHTML = pageData.map((r, i) => {
+    const idx = start + i;
+    const vBadge = r.verified === 'YES'
+      ? '<span style="color:var(--green);font-weight:600">✓</span>'
+      : '<span style="color:var(--text-dim)">—</span>';
+    const doiLink = r.doi ? '<a href="https://doi.org/' + esc(r.doi) + '" target="_blank" title="' + esc(r.doi) + '" onclick="event.stopPropagation()" style="color:var(--blue);text-decoration:none">' + esc(short(r.doi, 24)) + '</a>' : '—';
+    return '<tr onclick="showDetail(' + idx + ')">' +
+      '<td>' + vBadge + '</td>' +
+      '<td class="doi">' + doiLink + '</td>' +
+      '<td title="' + esc(r.donor) + '">' + esc(short(r.donor, 16)) + '</td>' +
+      '<td title="' + esc(r.acceptor) + '">' + esc(short(r.acceptor, 16)) + '</td>' +
+      '<td>' + esc(short(r.d_a_ratio, 8)) + '</td>' +
+      '<td class="num">' + fmtNum(r.voc) + '</td>' +
+      '<td class="num">' + fmtNum(r.jsc) + '</td>' +
+      '<td class="num">' + fmtNum(r.ff) + '</td>' +
+      '<td class="num" style="font-weight:600;color:var(--green)">' + fmtNum(r.pce) + '</td>' +
+      '<td title="' + esc(r.additive) + '">' + esc(short(r.additive, 12)) + '</td>' +
+      '<td title="' + esc(r.device_structure) + '">' + esc(short(r.device_structure, 14)) + '</td>' +
+    '</tr>';
+  }).join('');
+
+  renderPagination();
+}
+
+/* ══════════════════════════════════════
+   Pagination
+   ══════════════════════════════════════ */
+function renderPagination() {
+  const pages = Math.ceil(filtered.length / perPage) || 1;
+  const el = document.getElementById('pagination');
+  if (pages <= 1) { el.innerHTML = ''; return; }
+  let html = '<button onclick="goPage(1)" ' + (currentPage===1?'disabled':'') + '>«</button>';
+  html += '<button onclick="goPage(' + (currentPage-1) + ')" ' + (currentPage===1?'disabled':'') + '>‹</button>';
+  const start = Math.max(1, currentPage - 3);
+  const end = Math.min(pages, currentPage + 3);
+  for (let p = start; p <= end; p++) {
+    html += '<button onclick="goPage(' + p + ')" class="' + (p===currentPage?'active':'') + '">' + p + '</button>';
+  }
+  html += '<span class="page-info">' + currentPage + ' / ' + pages + '</span>';
+  html += '<button onclick="goPage(' + (currentPage+1) + ')" ' + (currentPage===pages?'disabled':'') + '>›</button>';
+  html += '<button onclick="goPage(' + pages + ')" ' + (currentPage===pages?'disabled':'') + '>»</button>';
+  el.innerHTML = html;
+}
+
+function goPage(p) {
+  const pages = Math.ceil(filtered.length / perPage) || 1;
+  currentPage = Math.max(1, Math.min(pages, p));
+  renderTable();
+  window.scrollTo({ top: document.querySelector('.table-wrap').offsetTop - 60, behavior: 'smooth' });
+}
+
+/* ══════════════════════════════════════
+   Detail Modal
+   ══════════════════════════════════════ */
+function showDetail(idx) {
+  const r = filtered[idx];
+  if (!r) return;
+
+  const fields = [
+    ['DOI', r.doi ? '<a href="https://doi.org/' + esc(r.doi) + '" target="_blank" style="color:var(--blue)">' + esc(r.doi) + '</a>' : '—'],
+    ['Verified', r.verified === 'YES' ? '<span style="color:var(--green)">✓ YES</span>' : '—'],
+    ['Donor', r.donor], ['Acceptor', r.acceptor],
+    ['Donor SMILES', r.donor_smiles], ['Acceptor SMILES', r.acceptor_smiles],
+    ['__section', 'Performance'],
+    ['Voc (V)', fmtNum(r.voc)], ['Jsc (mA/cm²)', fmtNum(r.jsc)],
+    ['FF', fmtNum(r.ff)], ['PCE (%)', fmtNum(r.pce)],
+    ['PCE avg (%)', fmtNum(r.pce_avg)], ['PCE best (%)', fmtNum(r.pce_best)],
+    ['__section', 'Energy Levels'],
+    ['HOMO_D (eV)', fmtNum(r.homo_d)], ['LUMO_D (eV)', fmtNum(r.lumo_d)],
+    ['Ehl_D (eV)', fmtNum(r.ehl_d)], ['Eg_D (eV)', fmtNum(r.eg_d)],
+    ['HOMO_A (eV)', fmtNum(r.homo_a)], ['LUMO_A (eV)', fmtNum(r.lumo_a)],
+    ['Ehl_A (eV)', fmtNum(r.ehl_a)], ['Eg_A (eV)', fmtNum(r.eg_a)],
+    ['__section', 'Device Information'],
+    ['D:A Ratio', r.d_a_ratio], ['Additive', r.additive],
+    ['Device Structure', r.device_structure], ['ETL', r.etl],
+    ['HTL', r.htl], ['Active Layer Thickness (nm)', fmtNum(r.active_layer_thickness)],
+    ['Solvent', r.solvent], ['Annealing Temp (°C)', fmtNum(r.annealing_temp)],
+  ];
+
+  const extra = r.extra_columns || {};
+  const extraKeys = Object.keys(extra);
+  if (extraKeys.length) {
+    fields.push(['__section', 'Additional Data']);
+    extraKeys.forEach(k => fields.push([k, extra[k]]));
+    if (extraKeys.length % 2 !== 0) fields.push(['', '']);
+  }
+
+  let html = '<div class="detail-grid">';
+  fields.forEach(([label, value]) => {
+    if (label === '__section') {
+      html += '<div class="detail-section">' + esc(value) + '</div>';
+    } else if (label === 'DOI' || label === 'Verified') {
+      html += '<div class="detail-item"><div class="detail-label">' + esc(label) + '</div><div class="detail-value">' + (value || '—') + '</div></div>';
+    } else {
+      html += '<div class="detail-item"><div class="detail-label">' + esc(label) + '</div><div class="detail-value">' + esc(value || '—') + '</div></div>';
+    }
+  });
+  html += '</div>';
+
+  document.getElementById('detailTitle').textContent = '📋 ' + short(r.donor || '?', 20) + ' / ' + short(r.acceptor || '?', 20);
+  document.getElementById('detailBody').innerHTML = html;
+  document.getElementById('detailModal').classList.add('show');
+}
+
+function closeDetail() { document.getElementById('detailModal').classList.remove('show'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
+
+/* ══════════════════════════════════════
+   CSV Download
+   ══════════════════════════════════════ */
+const CSV_COLS = ['doi','donor','acceptor','donor_smiles','acceptor_smiles','voc','jsc','ff','pce','pce_avg','pce_best','homo_d','lumo_d','ehl_d','eg_d','homo_a','lumo_a','ehl_a','eg_a','d_a_ratio','additive','device_structure','etl','htl','active_layer_thickness','solvent','annealing_temp','verified'];
+
+function buildCSV(data) {
+  const header = CSV_COLS.join(',');
+  const rows = data.map(r => CSV_COLS.map(c => {
+    let v = r[c] ?? '';
+    v = String(v);
+    if (v.includes(',') || v.includes('"') || v.includes('\n')) v = '"' + v.replace(/"/g, '""') + '"';
+    return v;
+  }).join(','));
+  return header + '\n' + rows.join('\n');
+}
+
+function triggerDownload(blob, filename) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* --- Header: Download ALL --- */
+function downloadAllCSV() {
+  const blob = new Blob(['\ufeff' + buildCSV(allData)], { type: 'text/csv;charset=utf-8' });
+  triggerDownload(blob, 'OPV_Database.csv');
+}
+function downloadAllJSON() {
+  const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+  triggerDownload(blob, 'OPV_Database.json');
+}
+
+/* --- Toolbar: Download FILTERED --- */
+function downloadFilteredCSV() {
+  const blob = new Blob(['\ufeff' + buildCSV(filtered)], { type: 'text/csv;charset=utf-8' });
+  triggerDownload(blob, 'OPV_Database_filtered.csv');
+}
+function downloadFilteredJSON() {
+  const blob = new Blob([JSON.stringify(filtered, null, 2)], { type: 'application/json' });
+  triggerDownload(blob, 'OPV_Database_filtered.json');
+}
+
+document.getElementById('downloadAllCsvBtn').addEventListener('click', e => { e.preventDefault(); downloadAllCSV(); });
+document.getElementById('downloadAllJsonBtn').addEventListener('click', e => { e.preventDefault(); downloadAllJSON(); });
+
+function updateFilteredDownloadBtns() {
+  const isFiltered = filtered.length && filtered.length !== allData.length;
+  const csvBtn = document.getElementById('downloadFilteredCsvBtn');
+  const jsonBtn = document.getElementById('downloadFilteredJsonBtn');
+  csvBtn.style.display = isFiltered ? '' : 'none';
+  jsonBtn.style.display = isFiltered ? '' : 'none';
+  if (isFiltered) {
+    csvBtn.textContent = '📤 Export CSV (' + filtered.length + ')';
+    jsonBtn.textContent = '📦 Export JSON (' + filtered.length + ')';
+  }
+}
+
+/* ══════════════════════════════════════
+   Init
+   ══════════════════════════════════════ */
+loadData();
+</script>
+</body>
+</html>
