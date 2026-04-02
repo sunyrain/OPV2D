@@ -107,20 +107,14 @@
     .filter-group { display: flex; flex-direction: column; gap: 2px; }
     .filter-sep { width: 1px; height: 32px; background: var(--border); margin: 0 4px; }
 
-    /* ── Top Donors/Acceptors ───────────── */
-    .top-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px; }
-    .top-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow);
+    /* ── Citation Bar ───────────────────── */
+    .citation-bar {
+      max-width: 1200px; margin: 0 auto; padding: 10px 24px;
+      background: var(--bg-card); border-bottom: 1px solid var(--border);
+      font-size: .82rem; color: var(--text-muted); line-height: 1.6;
     }
-    .top-card h3 { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; }
-    .top-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 4px 0; border-bottom: 1px solid var(--border); font-size: 12px;
-    }
-    .top-item:last-child { border-bottom: none; }
-    .top-item .name { color: var(--text); font-weight: 500; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .top-item .count { color: var(--blue); font-weight: 700; }
+    .citation-bar a { color: var(--blue); text-decoration: none; }
+    .citation-bar a:hover { text-decoration: underline; }
 
     /* ── Data Table ─────────────────────── */
     .table-wrap {
@@ -208,7 +202,6 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* responsive */
-    @media (max-width: 960px) { .top-row { grid-template-columns: 1fr; } }
     @media (max-width: 768px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
       .site-header h1 { font-size: 22px; }
@@ -231,6 +224,13 @@
     <a href="#" id="downloadAllJsonBtn">📦 Download All JSON</a>
   </div>
 </header>
+
+<!-- ═══════ CITATION ═══════ -->
+<div class="citation-bar">
+  <span>📝 <strong>Citation:</strong></span>
+  Qiu et al., <em>Accelerating High-Efficiency OPV Discovery via Pretrained GNNs and Generative RL</em>, <a href="https://arxiv.org/abs/2503.23766" target="_blank">arXiv:2503.23766</a>, 2025 &nbsp;|&nbsp;
+  Lam et al., <em>CycleChemist: A Dual-Pronged ML Framework for OPV Discovery</em>, <a href="https://arxiv.org/abs/2511.19500" target="_blank">arXiv:2511.19500</a>, 2025
+</div>
 
 <div class="container">
 
@@ -262,18 +262,6 @@
     <div class="label">Avg PCE</div>
     <div class="value" id="statAvgPce">—</div>
     <div class="sub" id="statMaxPce"></div>
-  </div>
-</div>
-
-<!-- ═══════ TOP DONORS / ACCEPTORS ═══════ -->
-<div class="top-row">
-  <div class="top-card">
-    <h3>🏆 Top Donors</h3>
-    <div id="topDonors"></div>
-  </div>
-  <div class="top-card">
-    <h3>🏆 Top Acceptors</h3>
-    <div id="topAcceptors"></div>
   </div>
 </div>
 
@@ -367,11 +355,6 @@
 <!-- ═══════ FOOTER ═══════ -->
 <footer class="site-footer">
   <p>OPV Performance Database &mdash; Part of <a href="https://github.com/sunyrain/OPV2D" target="_blank">OPV2D</a> &middot; Data extracted via <a href="https://github.com/sunyrain/Literature-Datamining" target="_blank">Literature-Datamining</a></p>
-  <p style="margin-top:6px;font-size:.82rem;color:var(--text-dim);line-height:1.5">
-    If you use this dataset, please cite:<br>
-    Qiu et al., <em>Accelerating High-Efficiency OPV Discovery via Pretrained GNNs and Generative RL</em>, <a href="https://arxiv.org/abs/2503.23766" target="_blank" style="color:var(--blue)">arXiv:2503.23766</a>, 2025<br>
-    Lam et al., <em>CycleChemist: A Dual-Pronged ML Framework for OPV Discovery</em>, <a href="https://arxiv.org/abs/2511.19500" target="_blank" style="color:var(--blue)">arXiv:2511.19500</a>, 2025
-  </p>
   <p style="margin-top:4px">Last updated: <span id="lastUpdated">—</span></p>
 </footer>
 
@@ -430,22 +413,6 @@ function computeStats() {
   document.getElementById('statVerifiedRate').textContent = total ? (verified/total*100).toFixed(1) + '% verified' : '';
   document.getElementById('statAvgPce').textContent = avgPce.toFixed(2) + '%';
   document.getElementById('statMaxPce').textContent = 'Max ' + maxPce.toFixed(2) + '%';
-
-  // Top donors / acceptors
-  renderTopList('topDonors', 'donor');
-  renderTopList('topAcceptors', 'acceptor');
-}
-
-function renderTopList(elId, field) {
-  const counts = {};
-  allData.forEach(r => {
-    const v = (r[field] || '').trim();
-    if (v) counts[v] = (counts[v] || 0) + 1;
-  });
-  const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 10);
-  document.getElementById(elId).innerHTML = sorted.map(([name, count]) =>
-    '<div class="top-item"><span class="name" title="' + esc(name) + '">' + esc(short(name, 30)) + '</span><span class="count">' + count + '</span></div>'
-  ).join('');
 }
 
 /* ══════════════════════════════════════
