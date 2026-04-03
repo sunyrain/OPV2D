@@ -53,6 +53,16 @@ If you use this dataset in your research, please cite the following paper:
 And cite the original data sources:
 
 ```bibtex
+@dataset{li2025opv,
+   author  = {Li, Yuan-Fang},
+   title   = {Training dataset for predicting PCE of organic solar cells},
+   year    = {2025},
+   publisher = {Zenodo},
+   doi     = {10.5281/zenodo.16784519},
+   url     = {https://doi.org/10.5281/zenodo.16784519},
+   note    = {5,628 experimental records of binary OSCs with SMILES and energy levels, CC-BY 4.0}
+}
+
 @article{Min2020,
    author  = {Wu, Yao and Guo, Jie and Sun, Rui and Min, Jie},
    title   = {Machine learning for accelerating the discovery of high-performance donor/acceptor pairs in non-fullerene organic solar cells},
