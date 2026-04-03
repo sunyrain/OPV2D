@@ -333,6 +333,15 @@
       <option value="0">Incomplete</option>
     </select>
   </div>
+  <div class="filter-sep"></div>
+  <div class="filter-group">
+    <label>Source</label>
+    <select id="filterSource" onchange="applyFilters()">
+      <option value="">All</option>
+      <option value="csv_import">Text Mining</option>
+      <option value="zenodo_li2025">Zenodo Li2025</option>
+    </select>
+  </div>
 </div>
 
 <!-- ═══════ TABLE ═══════ -->
@@ -351,6 +360,7 @@
         <th onclick="sortBy('pce')">PCE <span class="sort-arrow" id="sort-pce"></span></th>
         <th onclick="sortBy('additive')">Additive <span class="sort-arrow" id="sort-additive"></span></th>
         <th onclick="sortBy('device_structure')">Device <span class="sort-arrow" id="sort-device_structure"></span></th>
+        <th onclick="sortBy('source_table')">Source <span class="sort-arrow" id="sort-source_table"></span></th>
       </tr>
     </thead>
     <tbody id="dataBody"></tbody>
@@ -445,6 +455,7 @@ function applyFilters() {
   const pMax = parseFloat(document.getElementById('filterPceMax').value);
   const smiles = document.getElementById('filterSmiles').value;
   const coreComp = document.getElementById('filterCoreComplete').value;
+  const src = document.getElementById('filterSource').value;
 
   filtered = allData.filter(r => {
     if (search && !(r.doi||'').toLowerCase().includes(search) && !(r.donor||'').toLowerCase().includes(search) && !(r.acceptor||'').toLowerCase().includes(search)) return false;
@@ -456,6 +467,7 @@ function applyFilters() {
     if (smiles === '0' && (r.donor_smiles || r.acceptor_smiles)) return false;
     if (coreComp === '1' && (!r.donor || !r.acceptor || r.voc == null || r.jsc == null || r.ff == null || r.pce == null)) return false;
     if (coreComp === '0' && r.donor && r.acceptor && r.voc != null && r.jsc != null && r.ff != null && r.pce != null) return false;
+    if (src && r.source_table !== src) return false;
     return true;
   });
 
@@ -472,6 +484,7 @@ function clearFilters() {
   document.getElementById('filterPceMax').value = '';
   document.getElementById('filterSmiles').value = '';
   document.getElementById('filterCoreComplete').value = '';
+  document.getElementById('filterSource').value = '';
   applyFilters();
 }
 
@@ -529,6 +542,7 @@ function renderTable() {
       '<td class="num" style="font-weight:600;color:var(--green)">' + fmtNum(r.pce) + '</td>' +
       '<td title="' + esc(r.additive) + '">' + esc(short(r.additive, 12)) + '</td>' +
       '<td title="' + esc(r.device_structure) + '">' + esc(short(r.device_structure, 14)) + '</td>' +
+      '<td title="' + esc(r.source_table) + '">' + esc(short(r.source_table, 12)) + '</td>' +
     '</tr>';
   }).join('');
 
@@ -571,7 +585,6 @@ function showDetail(idx) {
 
   const fields = [
     ['DOI', r.doi ? '<a href="https://doi.org/' + esc(r.doi) + '" target="_blank" style="color:var(--blue)">' + esc(r.doi) + '</a>' : '—'],
-    ['Verified', r.verified === 'YES' ? '<span style="color:var(--green)">✓ YES</span>' : '—'],
     ['Donor', r.donor], ['Acceptor', r.acceptor],
     ['Donor SMILES', r.donor_smiles], ['Acceptor SMILES', r.acceptor_smiles],
     ['__section', 'Performance'],
@@ -588,6 +601,8 @@ function showDetail(idx) {
     ['Device Structure', r.device_structure], ['ETL', r.etl],
     ['HTL', r.htl], ['Active Layer Thickness (nm)', fmtNum(r.active_layer_thickness)],
     ['Solvent', r.solvent], ['Annealing Temp (°C)', fmtNum(r.annealing_temp)],
+    ['__section', 'Metadata'],
+    ['Source', r.source_table], ['Verified', r.verified === 'YES' ? '<span style="color:var(--green)">✓ YES</span>' : 'NO'],
   ];
 
   const extra = r.extra_columns || {};
@@ -621,7 +636,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(
 /* ══════════════════════════════════════
    CSV Download
    ══════════════════════════════════════ */
-const CSV_COLS = ['doi','donor','acceptor','donor_smiles','acceptor_smiles','voc','jsc','ff','pce','pce_avg','pce_best','homo_d','lumo_d','ehl_d','eg_d','homo_a','lumo_a','ehl_a','eg_a','d_a_ratio','additive','device_structure','etl','htl','active_layer_thickness','solvent','annealing_temp','verified'];
+const CSV_COLS = ['doi','donor','acceptor','donor_smiles','acceptor_smiles','voc','jsc','ff','pce','pce_avg','pce_best','homo_d','lumo_d','ehl_d','eg_d','homo_a','lumo_a','ehl_a','eg_a','d_a_ratio','additive','device_structure','etl','htl','active_layer_thickness','solvent','annealing_temp','source_table','verified'];
 
 function buildCSV(data) {
   const header = CSV_COLS.join(',');
