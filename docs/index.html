@@ -3,700 +3,890 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OPV Performance Database</title>
+  <title>OPV-DB Literature-Mined Device Database</title>
   <style>
     :root {
-      --bg-page: #f8f9fb;
-      --bg-card: #ffffff;
-      --bg-hover: #f1f3f9;
-      --border: #e2e5ed;
-      --text: #1a1d28;
-      --text-muted: #64748b;
-      --text-dim: #94a3b8;
-      --green: #10b981;
-      --green-bg: #ecfdf5;
-      --red: #ef4444;
-      --blue: #6366f1;
-      --blue-bg: #eef2ff;
-      --amber: #f59e0b;
-      --cyan: #06b6d4;
-      --purple: #a855f7;
-      --radius: 12px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-      --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+      --page: #f6f7f9;
+      --panel: #ffffff;
+      --panel-2: #f9fafb;
+      --border: #dfe3ea;
+      --text: #1d2430;
+      --muted: #647082;
+      --soft: #8d98a8;
+      --blue: #1f5a8f;
+      --teal: #16807c;
+      --green: #3f8f5c;
+      --amber: #d98324;
+      --red: #b44a43;
+      --purple: #7a61a8;
+      --gray: #7e8790;
+      --shadow: 0 1px 2px rgba(18, 27, 38, 0.06);
+      --radius: 8px;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    * { box-sizing: border-box; }
     body {
-      background: var(--bg-page); color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
-      line-height: 1.6; min-height: 100vh;
+      margin: 0;
+      background: var(--page);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
     }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
 
-    /* ── Header ─────────────────────────── */
     .site-header {
-      background: linear-gradient(135deg, #312e81 0%, #4f46e5 50%, #7c3aed 100%);
-      color: #fff; padding: 44px 24px 36px; text-align: center;
+      background: #17212b;
+      color: #fff;
+      border-bottom: 4px solid var(--teal);
     }
-    .site-header h1 { font-size: 30px; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.3px; }
-    .site-header .subtitle { font-size: 14px; opacity: 0.85; max-width: 640px; margin: 0 auto; line-height: 1.7; }
-    .site-header .subtitle a { color: #c7d2fe; text-decoration: underline; text-underline-offset: 2px; }
-    .site-header .subtitle a:hover { color: #fff; }
-    .site-header .links { margin-top: 18px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-    .site-header .links a {
-      color: rgba(255,255,255,0.92); text-decoration: none; font-size: 12px; font-weight: 500;
-      padding: 6px 16px; border: 1px solid rgba(255,255,255,0.25); border-radius: 20px;
-      backdrop-filter: blur(4px); background: rgba(255,255,255,0.08); transition: .2s;
+    .header-inner {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 20px 24px 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: end;
     }
-    .site-header .links a:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
-
-    /* ── KPI Stats ──────────────────────── */
-    .stats-row {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 14px; margin-bottom: 22px;
+    h1 {
+      margin: 0 0 5px;
+      font-size: 25px;
+      line-height: 1.15;
+      letter-spacing: 0;
+      font-weight: 750;
     }
-    .stat-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 16px; text-align: center;
-      box-shadow: var(--shadow); border-top: 3px solid var(--blue);
+    .subtitle {
+      margin: 0;
+      color: #cbd5e1;
+      max-width: 900px;
+      font-size: 13px;
     }
-    .stat-card .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
-    .stat-card .value { font-size: 26px; font-weight: 700; color: var(--blue); }
-    .stat-card .sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
-    .stat-card.green { border-top-color: var(--green); }
-    .stat-card.green .value { color: var(--green); }
-    .stat-card.amber { border-top-color: var(--amber); }
-    .stat-card.amber .value { color: var(--amber); }
-    .stat-card.cyan { border-top-color: var(--cyan); }
-    .stat-card.cyan .value { color: var(--cyan); }
-
-    /* ── Toolbar ────────────────────────── */
-    .toolbar {
-      display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
-    .toolbar input[type="text"] {
-      padding: 7px 14px; border: 1px solid var(--border); border-radius: 8px;
-      font-size: 13px; background: var(--bg-card); outline: none;
-      min-width: 280px; transition: border-color .2s;
-    }
-    .toolbar input[type="text"]:focus { border-color: var(--blue); }
     .btn {
-      padding: 7px 16px; border: none; border-radius: 8px;
-      font-size: 13px; font-weight: 600; cursor: pointer;
-      transition: all .2s; display: inline-flex; align-items: center; gap: 5px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 7px;
+      padding: 7px 11px;
+      font-size: 12px;
+      font-weight: 650;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 32px;
     }
-    .btn-primary { background: var(--blue); color: #fff; }
-    .btn-primary:hover { background: #4f46e5; }
-    .btn-accent { background: var(--green); color: #fff; font-weight: 600; font-size: .82rem; border-radius: 20px; padding: 7px 18px; }
-    .btn-accent:hover { background: #059669; }
-    .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
-    .btn-ghost:hover { background: var(--bg-hover); }
-    .toolbar .spacer { flex: 1; }
-    .toolbar .info { font-size: 12px; color: var(--text-dim); }
+    .btn:hover { background: #edf2f7; text-decoration: none; }
+    .site-header .btn {
+      border-color: rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+    .site-header .btn:hover { background: rgba(255,255,255,0.16); }
+    .btn-primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .btn-primary:hover { background: #174974; }
+    .btn-secondary { background: #edf7f5; border-color: #b9d8d2; color: #0f615d; }
+    .btn-secondary:hover { background: #dff0ed; }
 
-    /* ── Filter Bar ────────────────────── */
-    .filter-bar {
-      display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;
-      padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius); box-shadow: var(--shadow);
-    }
-    .filter-bar label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; }
-    .filter-bar select, .filter-bar input[type="number"] {
-      padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px;
-      font-size: 12px; background: var(--bg-page); outline: none; min-width: 90px;
-    }
-    .filter-bar select:focus, .filter-bar input[type="number"]:focus { border-color: var(--blue); }
-    .filter-group { display: flex; flex-direction: column; gap: 2px; }
-    .filter-sep { width: 1px; height: 32px; background: var(--border); margin: 0 4px; }
+    .wrap { max-width: 1480px; margin: 0 auto; padding: 16px 24px 34px; }
 
-    /* ── Citation Bar ───────────────────── */
-    .citation-bar {
-      max-width: 1400px; margin: 0 auto; padding: 14px 24px;
-      background: linear-gradient(90deg, #eef2ff 0%, #f5f3ff 100%);
-      border-bottom: 1px solid #ddd6fe;
-      font-size: .82rem; color: var(--text-muted); line-height: 1.7;
+    .release-strip {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px 14px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 14px;
     }
-    .citation-bar .cite-title { font-weight: 700; color: var(--blue); margin-bottom: 4px; font-size: .85rem; }
-    .citation-bar .cite-item { display: flex; gap: 6px; align-items: baseline; padding: 1px 0; }
-    .citation-bar .cite-num {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 18px; height: 18px; border-radius: 50%; background: var(--blue); color: #fff;
-      font-size: 10px; font-weight: 700; flex-shrink: 0;
+    .release-title { font-weight: 750; color: var(--text); margin-bottom: 2px; }
+    .release-note { color: var(--muted); font-size: 12px; }
+    .release-id {
+      color: var(--soft);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      overflow-wrap: anywhere;
     }
-    .citation-bar a { color: var(--blue); text-decoration: none; font-weight: 500; }
-    .citation-bar a:hover { text-decoration: underline; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      border-radius: 999px;
+      padding: 3px 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .pill.green { color: #216d45; background: #eef8f0; border-color: #cae8d1; }
+    .pill.blue { color: #174974; background: #eef5fb; border-color: #cbddec; }
+    .pill.amber { color: #8a4e10; background: #fff6e9; border-color: #f0d2a8; }
+    .pill.red { color: #8f322e; background: #fff0ee; border-color: #edc7c3; }
+    .pill.purple { color: #5e4b88; background: #f4f0fb; border-color: #ded4ef; }
 
-    /* ── Data Table ─────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px 12px 10px;
+      min-width: 0;
+      border-top: 3px solid var(--blue);
+    }
+    .stat.teal { border-top-color: var(--teal); }
+    .stat.green { border-top-color: var(--green); }
+    .stat.amber { border-top-color: var(--amber); }
+    .stat.purple { border-top-color: var(--purple); }
+    .stat.gray { border-top-color: var(--gray); }
+    .stat .label {
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 10.5px;
+      font-weight: 750;
+      letter-spacing: 0;
+      margin-bottom: 4px;
+    }
+    .stat .value {
+      font-size: 24px;
+      line-height: 1.1;
+      font-weight: 760;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat .sub { color: var(--soft); font-size: 11px; margin-top: 3px; min-height: 14px; }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+    }
+    .panel-header {
+      padding: 12px 14px 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .panel-title { margin: 0; font-size: 14px; font-weight: 760; }
+    .panel-body { padding: 12px 14px 14px; }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1.6fr repeat(6, minmax(110px, 1fr)) auto;
+      gap: 9px;
+      align-items: end;
+    }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field label {
+      color: var(--muted);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      font-weight: 760;
+      letter-spacing: 0;
+    }
+    input, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--text);
+      min-height: 34px;
+      padding: 7px 9px;
+      font-size: 12px;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(31, 90, 143, 0.12); }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 170px minmax(120px, 1fr) 90px;
+      gap: 10px;
+      align-items: center;
+      padding: 6px 0;
+    }
+    .bar-label { font-size: 12px; color: var(--muted); font-weight: 650; }
+    .bar-track {
+      height: 10px;
+      border-radius: 999px;
+      background: #edf1f5;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--blue);
+      width: 0;
+    }
+    .bar-fill.teal { background: var(--teal); }
+    .bar-fill.green { background: var(--green); }
+    .bar-fill.amber { background: var(--amber); }
+    .bar-fill.red { background: var(--red); }
+    .bar-value {
+      font-size: 12px;
+      color: var(--text);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
     .table-wrap {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius); box-shadow: var(--shadow);
-      overflow-x: auto; margin-bottom: 20px;
+      overflow: auto;
+      max-height: calc(100vh - 250px);
+      border-top: 1px solid var(--border);
     }
-    table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
-    table th {
-      text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--border);
-      color: var(--text-muted); font-weight: 600; font-size: 11px;
-      text-transform: uppercase; letter-spacing: 0.3px;
-      position: sticky; top: 0; background: var(--bg-card); z-index: 1;
-      cursor: pointer; user-select: none;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      white-space: nowrap;
     }
-    table th:hover { color: var(--blue); }
-    table th .sort-arrow { font-size: 10px; margin-left: 3px; }
-    table td {
-      padding: 7px 12px; border-bottom: 1px solid var(--border);
-      max-width: 200px; overflow: hidden; text-overflow: ellipsis;
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      text-align: left;
+      background: #f9fafb;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 10px;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      font-weight: 780;
+      cursor: pointer;
     }
-    table tr:hover td { background: var(--bg-hover); }
-    table td.num { text-align: right; font-variant-numeric: tabular-nums; }
-    table td.doi { color: var(--blue); max-width: 180px; }
-    table tr { cursor: pointer; }
-
-    /* ── Pagination ─────────────────────── */
-    .pagination {
-      display: flex; justify-content: center; align-items: center;
-      gap: 8px; padding: 16px 0;
+    th:hover { color: var(--blue); }
+    td {
+      border-bottom: 1px solid #edf0f4;
+      padding: 8px 10px;
+      vertical-align: middle;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+    tr:hover td { background: #f7fafc; }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .layer-cell { min-width: 142px; }
+    .doi-cell { max-width: 210px; }
+    .status-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 9px 12px;
+      border-top: 1px solid var(--border);
+      background: #fbfcfd;
+    }
+    .pagination { display: flex; gap: 6px; align-items: center; }
     .pagination button {
-      padding: 5px 14px; border: 1px solid var(--border); border-radius: 6px;
-      background: var(--bg-card); color: var(--text-muted); cursor: pointer;
-      font-size: 12px; transition: all .2s;
+      min-width: 30px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 6px;
+      padding: 5px 8px;
+      cursor: pointer;
     }
-    .pagination button:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
-    .pagination button:disabled { opacity: .4; cursor: not-allowed; }
+    .pagination button:disabled { opacity: 0.45; cursor: default; }
     .pagination button.active { background: var(--blue); color: #fff; border-color: var(--blue); }
-    .pagination .page-info { font-size: 12px; color: var(--text-dim); }
 
-    /* ── Detail Modal ─────────────────── */
     .modal-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-      z-index: 900; align-items: center; justify-content: center;
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      background: rgba(17, 24, 39, 0.48);
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
     }
     .modal-overlay.show { display: flex; }
     .modal {
-      background: var(--bg-card); border-radius: var(--radius);
-      box-shadow: var(--shadow-lg); width: 720px; max-width: 92vw;
-      max-height: 85vh; overflow-y: auto;
+      width: min(980px, 96vw);
+      max-height: 88vh;
+      overflow: auto;
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: 0 18px 46px rgba(17, 24, 39, 0.24);
+      border: 1px solid var(--border);
     }
     .modal-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 24px; border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; background: var(--bg-card); z-index: 1;
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
     }
-    .modal-header h2 { font-size: 16px; font-weight: 700; }
-    .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px 8px; }
-    .modal-close:hover { color: var(--red); }
-    .modal-body { padding: 20px 24px; }
-    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
-    .detail-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
-    .detail-item:nth-child(odd) { padding-right: 16px; }
-    .detail-item:nth-child(even) { padding-left: 16px; border-left: 1px solid var(--border); }
-    .detail-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; margin-bottom: 2px; }
-    .detail-value { font-size: 13px; font-weight: 500; word-break: break-all; }
-    .detail-section { font-size: 13px; font-weight: 700; color: var(--blue); padding: 12px 0 6px; border-bottom: 2px solid var(--blue); grid-column: 1 / -1; margin-top: 8px; }
+    .modal-title { margin: 0; font-size: 15px; font-weight: 760; }
+    .modal-body { padding: 14px 16px 18px; }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .detail-card {
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: #fbfcfd;
+      padding: 9px 10px;
+      min-width: 0;
+    }
+    .detail-card.wide { grid-column: 1 / -1; }
+    .detail-label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 780;
+      margin-bottom: 3px;
+    }
+    .detail-value {
+      font-size: 12.5px;
+      overflow-wrap: anywhere;
+    }
 
-    /* ── Footer ────────────────────────── */
-    .site-footer {
-      text-align: center; padding: 24px; font-size: 12px; color: var(--text-dim);
-      border-top: 1px solid var(--border); margin-top: 40px;
+    .loading {
+      color: var(--muted);
+      padding: 26px 0;
+      text-align: center;
     }
-    .site-footer a { color: var(--blue); text-decoration: none; }
-    .site-footer a:hover { text-decoration: underline; }
+    .error { color: var(--red); font-weight: 650; }
+    .footer {
+      color: var(--soft);
+      font-size: 12px;
+      text-align: center;
+      padding: 18px 24px 30px;
+    }
 
-    /* ── Loading ────────────────────────── */
-    .loading { text-align: center; padding: 60px; color: var(--text-dim); font-size: 14px; }
-    .loading .spinner {
-      display: inline-block; width: 32px; height: 32px;
-      border: 3px solid var(--border); border-top-color: var(--blue);
-      border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: 12px;
+    @media (max-width: 1180px) {
+      .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .toolbar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .toolbar .field:first-child { grid-column: 1 / -1; }
+      .summary-grid { grid-template-columns: 1fr; }
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* responsive */
-    @media (max-width: 768px) {
-      .stats-row { grid-template-columns: repeat(2, 1fr); }
-      .site-header h1 { font-size: 22px; }
-      .citation-bar { font-size: .78rem; padding: 12px 16px; }
+    @media (max-width: 720px) {
+      .header-inner, .release-strip { grid-template-columns: 1fr; }
+      .header-actions { justify-content: flex-start; }
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: 130px minmax(70px, 1fr) 72px; }
     }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg-page); }
-    ::-webkit-scrollbar-thumb { background: #c8cdd5; border-radius: 3px; }
   </style>
 </head>
 <body>
-
-<!-- ═══════ HEADER ═══════ -->
-<header class="site-header">
-  <h1>⚡ OPV Performance Database</h1>
-  <p class="subtitle">A curated dataset of organic photovoltaic device performance parameters extracted from scientific literature via AI-assisted data mining. Part of the <a href="https://github.com/sunyrain/OPV2D" target="_blank">OPV2D</a> project.</p>
-  <div class="links">
-    <a href="https://github.com/sunyrain/OPV2D" target="_blank">📂 GitHub</a>
-    <a href="#" id="downloadAllCsvBtn">📤 Download All CSV</a>
-    <a href="#" id="downloadAllJsonBtn">📦 Download All JSON</a>
-  </div>
-</header>
-
-<!-- ═══════ CITATION ═══════ -->
-<div class="citation-bar">
-  <div class="cite-title">📝 If you use this dataset, please cite:</div>
-  <div class="cite-item">
-    <span class="cite-num">1</span>
-    <span>Qiu et al., <em>Accelerating High-Efficiency Organic Photovoltaic Discovery via Pretrained Graph Neural Networks and Generative Reinforcement Learning</em>, <a href="https://arxiv.org/abs/2503.23766" target="_blank">arXiv:2503.23766</a>, 2025</span>
-  </div>
-  <div class="cite-item">
-    <span class="cite-num">2</span>
-    <span>Lam et al., <em>CycleChemist: A Dual-Pronged Machine Learning Framework for Organic Photovoltaic Discovery</em>, <a href="https://arxiv.org/abs/2511.19500" target="_blank">arXiv:2511.19500</a>, 2025</span>
-  </div>
-  <div class="cite-item">
-    <span class="cite-num">3</span>
-    <span>Li, Y.-F., <em>Training dataset for predicting PCE of organic solar cells</em> [Data set], Zenodo, <a href="https://doi.org/10.5281/zenodo.16784519" target="_blank">doi:10.5281/zenodo.16784519</a>, 2025</span>
-  </div>
-</div>
-
-<div class="container">
-
-<!-- ═══════ LOADING ═══════ -->
-<div class="loading" id="loadingPanel">
-  <div class="spinner"></div>
-  <div>Loading database…</div>
-</div>
-
-<!-- ═══════ MAIN CONTENT (hidden until loaded) ═══════ -->
-<div id="mainContent" style="display:none">
-
-<!-- ═══════ STATS ═══════ -->
-<div class="stats-row">
-  <div class="stat-card">
-    <div class="label">Total Records</div>
-    <div class="value" id="statTotal">—</div>
-  </div>
-  <div class="stat-card cyan">
-    <div class="label">Publications (DOIs)</div>
-    <div class="value" id="statDois">—</div>
-  </div>
-  <div class="stat-card green">
-    <div class="label">Verified</div>
-    <div class="value" id="statVerified">—</div>
-    <div class="sub" id="statVerifiedRate"></div>
-  </div>
-  <div class="stat-card amber">
-    <div class="label">Avg PCE</div>
-    <div class="value" id="statAvgPce">—</div>
-    <div class="sub" id="statMaxPce"></div>
-  </div>
-</div>
-
-<!-- ═══════ TOOLBAR ═══════ -->
-<div class="toolbar">
-  <input type="text" id="searchInput" placeholder="Search DOI / Donor / Acceptor …" onkeydown="if(event.key==='Enter')applyFilters()">
-  <button class="btn btn-primary" onclick="applyFilters()">🔍 Search</button>
-  <button class="btn btn-ghost" onclick="clearFilters()">Clear</button>
-  <span class="spacer"></span>
-  <button class="btn btn-accent" id="downloadFilteredCsvBtn" style="display:none" onclick="downloadFilteredCSV()">📤 Export CSV</button>
-  <button class="btn btn-accent" id="downloadFilteredJsonBtn" style="display:none" onclick="downloadFilteredJSON()">📦 Export JSON</button>
-  <span class="info" id="tableInfo">—</span>
-</div>
-
-<!-- ═══════ FILTERS ═══════ -->
-<div class="filter-bar">
-  <div class="filter-group">
-    <label>Verified</label>
-    <select id="filterVerified" onchange="applyFilters()">
-      <option value="">All</option>
-      <option value="YES">Verified</option>
-      <option value="NO">Unverified</option>
-    </select>
-  </div>
-  <div class="filter-sep"></div>
-  <div class="filter-group">
-    <label>PCE Min</label>
-    <input type="number" id="filterPceMin" step="0.1" min="0" placeholder="—" style="width:70px" onchange="applyFilters()">
-  </div>
-  <div class="filter-group">
-    <label>PCE Max</label>
-    <input type="number" id="filterPceMax" step="0.1" min="0" placeholder="—" style="width:70px" onchange="applyFilters()">
-  </div>
-  <div class="filter-sep"></div>
-  <div class="filter-group">
-    <label>Has SMILES</label>
-    <select id="filterSmiles" onchange="applyFilters()">
-      <option value="">All</option>
-      <option value="1">Yes</option>
-      <option value="0">No</option>
-    </select>
-  </div>
-  <div class="filter-sep"></div>
-  <div class="filter-group">
-    <label>Core Complete</label>
-    <select id="filterCoreComplete" onchange="applyFilters()">
-      <option value="">All</option>
-      <option value="1">Complete</option>
-      <option value="0">Incomplete</option>
-    </select>
-  </div>
-  <div class="filter-sep"></div>
-  <div class="filter-group">
-    <label>Source</label>
-    <select id="filterSource" onchange="applyFilters()">
-      <option value="">All</option>
-      <option value="csv_import">Text Mining</option>
-      <option value="zenodo_li2025">Zenodo Li2025</option>
-      <option value="extraction">Extraction</option>
-    </select>
-  </div>
-</div>
-
-<!-- ═══════ TABLE ═══════ -->
-<div class="table-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th onclick="sortBy('verified')">Verified <span class="sort-arrow" id="sort-verified"></span></th>
-        <th onclick="sortBy('doi')">DOI <span class="sort-arrow" id="sort-doi"></span></th>
-        <th onclick="sortBy('donor')">Donor <span class="sort-arrow" id="sort-donor"></span></th>
-        <th onclick="sortBy('acceptor')">Acceptor <span class="sort-arrow" id="sort-acceptor"></span></th>
-        <th onclick="sortBy('d_a_ratio')">D:A <span class="sort-arrow" id="sort-d_a_ratio"></span></th>
-        <th onclick="sortBy('voc')">Voc <span class="sort-arrow" id="sort-voc"></span></th>
-        <th onclick="sortBy('jsc')">Jsc <span class="sort-arrow" id="sort-jsc"></span></th>
-        <th onclick="sortBy('ff')">FF <span class="sort-arrow" id="sort-ff"></span></th>
-        <th onclick="sortBy('pce')">PCE <span class="sort-arrow" id="sort-pce"></span></th>
-        <th onclick="sortBy('additive')">Additive <span class="sort-arrow" id="sort-additive"></span></th>
-        <th onclick="sortBy('device_structure')">Device <span class="sort-arrow" id="sort-device_structure"></span></th>
-        <th onclick="sortBy('source_table')">Source <span class="sort-arrow" id="sort-source_table"></span></th>
-      </tr>
-    </thead>
-    <tbody id="dataBody"></tbody>
-  </table>
-</div>
-<div class="pagination" id="pagination"></div>
-
-</div><!-- mainContent -->
-</div><!-- container -->
-
-<!-- ═══════ DETAIL MODAL ═══════ -->
-<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeDetail()">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 id="detailTitle">Record Detail</h2>
-      <button class="modal-close" onclick="closeDetail()">✕</button>
+  <header class="site-header">
+    <div class="header-inner">
+      <div>
+        <h1>OPV-DB Literature-Mined Device Database</h1>
+        <p class="subtitle">A frozen organic photovoltaic device archive with publication-facing benchmark layers for performance and molecular modelling.</p>
+      </div>
+      <div class="header-actions">
+        <a class="btn" href="https://github.com/sunyrain/OPV2D" target="_blank" rel="noopener">GitHub</a>
+        <button class="btn" id="downloadJsonBtn" type="button">JSON</button>
+        <button class="btn" id="downloadCsvBtn" type="button">CSV</button>
+      </div>
     </div>
-    <div class="modal-body" id="detailBody"></div>
+  </header>
+
+  <main class="wrap">
+    <section class="release-strip">
+      <div>
+        <div class="release-title">Publication release browser</div>
+        <div class="release-note">Full archive is retained for transparency. Performance claims and modelling subsets should use the strict benchmark layers.</div>
+        <div class="release-id" id="releaseId">Loading release...</div>
+      </div>
+      <div><span class="pill blue" id="updatedPill">Static JSON</span></div>
+    </section>
+
+    <div class="loading" id="loadingPanel">Loading OPV-DB records...</div>
+    <div id="app" style="display:none">
+      <section class="stats-grid" id="statsGrid"></section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Filters</h2>
+          <div class="header-actions">
+            <button class="btn btn-secondary" id="exportFilteredCsvBtn" type="button">Filtered CSV</button>
+            <button class="btn" id="clearBtn" type="button">Clear</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="toolbar">
+            <div class="field">
+              <label for="searchInput">Search</label>
+              <input id="searchInput" type="search" placeholder="DOI, donor, acceptor, SMILES, device stack">
+            </div>
+            <div class="field">
+              <label for="layerFilter">Layer</label>
+              <select id="layerFilter">
+                <option value="">All records</option>
+                <option value="strict_performance_benchmark" selected>Strict performance</option>
+                <option value="strict_molecular_benchmark">Strict molecular</option>
+                <option value="performance_grade">Performance grade</option>
+                <option value="performance_ready">Performance ready</option>
+                <option value="full_archive_only">Full archive only</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="pceMin">PCE min</label>
+              <input id="pceMin" type="number" min="0" step="0.1" placeholder="0">
+            </div>
+            <div class="field">
+              <label for="pceMax">PCE max</label>
+              <input id="pceMax" type="number" min="0" step="0.1" placeholder="30">
+            </div>
+            <div class="field">
+              <label for="errorFilter">PCE error</label>
+              <select id="errorFilter">
+                <option value="">All</option>
+                <option value="<=2%">&lt;=2%</option>
+                <option value="2-5%">2-5%</option>
+                <option value="5-10%">5-10%</option>
+                <option value=">10%">&gt;10%</option>
+                <option value="unchecked">Unchecked</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="smilesFilter">SMILES</label>
+              <select id="smilesFilter">
+                <option value="">All</option>
+                <option value="both">Both donor and acceptor</option>
+                <option value="missing">Missing one or both</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="processFilter">Process metadata</label>
+              <select id="processFilter">
+                <option value="">All</option>
+                <option value="device_structure">Device stack</option>
+                <option value="solvent">Solvent</option>
+                <option value="additive">Additive</option>
+                <option value="thickness">Thickness</option>
+                <option value="annealing">Annealing</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="applyBtn" type="button">Apply</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="summary-grid">
+        <div class="panel">
+          <div class="panel-header"><h2 class="panel-title">Benchmark layers</h2></div>
+          <div class="panel-body" id="tierBars"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><h2 class="panel-title">Validation and completeness</h2></div>
+          <div class="panel-body" id="qualityBars"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Device records</h2>
+          <span class="pill" id="tableInfo">0 records</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-sort="primary_layer">Layer</th>
+                <th data-sort="doi">DOI</th>
+                <th data-sort="publish_year">Year</th>
+                <th data-sort="donor">Donor</th>
+                <th data-sort="acceptor">Acceptor</th>
+                <th data-sort="pce">PCE</th>
+                <th data-sort="voc">Voc</th>
+                <th data-sort="jsc">Jsc</th>
+                <th data-sort="ff">FF</th>
+                <th data-sort="pce_relative_error_percent">PCE error</th>
+                <th data-sort="has_both_smiles">SMILES</th>
+                <th data-sort="device_type">Device</th>
+                <th data-sort="solvent">Solvent</th>
+                <th data-sort="additive">Additive</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <div class="status-line">
+          <span id="pageStatus">Page 1</span>
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="detailTitle">Record detail</h3>
+        <button class="btn" id="closeModalBtn" type="button">Close</button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+    </div>
   </div>
-</div>
 
-<!-- ═══════ FOOTER ═══════ -->
-<footer class="site-footer">
-  <p>OPV Performance Database &mdash; Part of <a href="https://github.com/sunyrain/OPV2D" target="_blank">OPV2D</a> &middot; Data extracted via <a href="https://github.com/sunyrain/Literature-Datamining" target="_blank">Literature-Datamining</a></p>
-  <p style="margin-top:4px">Last updated: <span id="lastUpdated">—</span></p>
-</footer>
+  <footer class="footer">
+    OPV-DB static browser. Record-level source DOIs are provided for provenance; publisher article assets are not redistributed.
+  </footer>
 
-<script>
-/* ══════════════════════════════════════
-   State
-   ══════════════════════════════════════ */
-let allData = [];
-let filtered = [];
-let currentPage = 1;
-const perPage = 100;
-let sortKey = 'pce';
-let sortAsc = false;
+  <script>
+    const PER_PAGE = 100;
+    let allData = [];
+    let filtered = [];
+    let currentPage = 1;
+    let sortKey = "pce";
+    let sortAsc = false;
 
-/* ══════════════════════════════════════
-   Utility
-   ══════════════════════════════════════ */
-function esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
-function short(s, n) { s = s || ''; return s.length > n ? s.slice(0, n) + '…' : s; }
-function fmtNum(v) { return v != null && v !== '' ? Number(v).toFixed(2) : '—'; }
+    const $ = (id) => document.getElementById(id);
+    const esc = (value) => {
+      const node = document.createElement("div");
+      node.textContent = value ?? "";
+      return node.innerHTML;
+    };
+    const isFilled = (value) => value !== null && value !== undefined && String(value).trim() !== "";
+    const fmtInt = (value) => Number(value || 0).toLocaleString();
+    const fmtNum = (value, digits = 2) => isFilled(value) && Number.isFinite(Number(value)) ? Number(value).toFixed(digits) : "-";
+    const short = (value, n = 24) => {
+      const text = String(value ?? "");
+      return text.length > n ? text.slice(0, n - 1) + "..." : text;
+    };
+    const uniqueCount = (rows, key) => new Set(rows.map((r) => r[key]).filter(isFilled)).size;
 
-/* ══════════════════════════════════════
-   Load Data
-   ══════════════════════════════════════ */
-async function loadData() {
-  try {
-    const resp = await fetch('opv_data.json');
-    allData = await resp.json();
-    document.getElementById('loadingPanel').style.display = 'none';
-    document.getElementById('mainContent').style.display = '';
-    computeStats();
-    applyFilters();
-
-    // Last updated from HTTP header
-    const lastMod = resp.headers.get('Last-Modified');
-    if (lastMod) document.getElementById('lastUpdated').textContent = new Date(lastMod).toLocaleDateString();
-  } catch(e) {
-    document.getElementById('loadingPanel').innerHTML = '<div style="color:var(--red)">Failed to load data: ' + e.message + '</div>';
-  }
-}
-
-/* ══════════════════════════════════════
-   Stats
-   ══════════════════════════════════════ */
-function computeStats() {
-  const total = allData.length;
-  const dois = new Set(allData.map(r => r.doi)).size;
-  const verified = allData.filter(r => r.verified === 'YES').length;
-  const pces = allData.map(r => r.pce).filter(v => v != null && v > 0);
-  const avgPce = pces.length ? (pces.reduce((a,b) => a+b, 0) / pces.length) : 0;
-  const maxPce = pces.length ? Math.max(...pces) : 0;
-
-  document.getElementById('statTotal').textContent = total.toLocaleString();
-  document.getElementById('statDois').textContent = dois.toLocaleString();
-  document.getElementById('statVerified').textContent = verified.toLocaleString();
-  document.getElementById('statVerifiedRate').textContent = total ? (verified/total*100).toFixed(1) + '% verified' : '';
-  document.getElementById('statAvgPce').textContent = avgPce.toFixed(2) + '%';
-  document.getElementById('statMaxPce').textContent = 'Max ' + maxPce.toFixed(2) + '%';
-}
-
-/* ══════════════════════════════════════
-   Filter & Sort
-   ══════════════════════════════════════ */
-function applyFilters() {
-  const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
-  const vf = document.getElementById('filterVerified').value;
-  const pMin = parseFloat(document.getElementById('filterPceMin').value);
-  const pMax = parseFloat(document.getElementById('filterPceMax').value);
-  const smiles = document.getElementById('filterSmiles').value;
-  const coreComp = document.getElementById('filterCoreComplete').value;
-  const src = document.getElementById('filterSource').value;
-
-  filtered = allData.filter(r => {
-    if (search && !(r.doi||'').toLowerCase().includes(search) && !(r.donor||'').toLowerCase().includes(search) && !(r.acceptor||'').toLowerCase().includes(search)) return false;
-    if (vf === 'YES' && r.verified !== 'YES') return false;
-    if (vf === 'NO' && r.verified === 'YES') return false;
-    if (!isNaN(pMin) && (r.pce == null || r.pce < pMin)) return false;
-    if (!isNaN(pMax) && (r.pce == null || r.pce > pMax)) return false;
-    if (smiles === '1' && !r.donor_smiles && !r.acceptor_smiles) return false;
-    if (smiles === '0' && (r.donor_smiles || r.acceptor_smiles)) return false;
-    if (coreComp === '1' && (!r.donor || !r.acceptor || r.voc == null || r.jsc == null || r.ff == null || r.pce == null)) return false;
-    if (coreComp === '0' && r.donor && r.acceptor && r.voc != null && r.jsc != null && r.ff != null && r.pce != null) return false;
-    if (src && r.source_table !== src) return false;
-    return true;
-  });
-
-  doSort();
-  currentPage = 1;
-  renderTable();
-  updateFilteredDownloadBtns();
-}
-
-function clearFilters() {
-  document.getElementById('searchInput').value = '';
-  document.getElementById('filterVerified').value = '';
-  document.getElementById('filterPceMin').value = '';
-  document.getElementById('filterPceMax').value = '';
-  document.getElementById('filterSmiles').value = '';
-  document.getElementById('filterCoreComplete').value = '';
-  document.getElementById('filterSource').value = '';
-  applyFilters();
-}
-
-function sortBy(key) {
-  if (sortKey === key) { sortAsc = !sortAsc; } else { sortKey = key; sortAsc = key === 'doi' || key === 'donor' || key === 'acceptor'; }
-  doSort();
-  renderTable();
-}
-
-function doSort() {
-  // Update arrows
-  document.querySelectorAll('.sort-arrow').forEach(el => el.textContent = '');
-  const arrow = document.getElementById('sort-' + sortKey);
-  if (arrow) arrow.textContent = sortAsc ? '▲' : '▼';
-
-  filtered.sort((a, b) => {
-    let va = a[sortKey], vb = b[sortKey];
-    if (va == null) va = sortAsc ? Infinity : -Infinity;
-    if (vb == null) vb = sortAsc ? Infinity : -Infinity;
-    if (typeof va === 'string') { va = va.toLowerCase(); vb = (vb || '').toLowerCase(); }
-    if (va < vb) return sortAsc ? -1 : 1;
-    if (va > vb) return sortAsc ? 1 : -1;
-    return 0;
-  });
-}
-
-/* ══════════════════════════════════════
-   Render Table
-   ══════════════════════════════════════ */
-function renderTable() {
-  const start = (currentPage - 1) * perPage;
-  const pageData = filtered.slice(start, start + perPage);
-
-  document.getElementById('tableInfo').textContent =
-    filtered.length === allData.length
-      ? filtered.length.toLocaleString() + ' records'
-      : filtered.length.toLocaleString() + ' / ' + allData.length.toLocaleString() + ' records';
-
-  const tbody = document.getElementById('dataBody');
-  tbody.innerHTML = pageData.map((r, i) => {
-    const idx = start + i;
-    const vBadge = r.verified === 'YES'
-      ? '<span style="color:var(--green);font-weight:600">✓</span>'
-      : '<span style="color:var(--text-dim)">—</span>';
-    const doiLink = r.doi ? '<a href="https://doi.org/' + esc(r.doi) + '" target="_blank" title="' + esc(r.doi) + '" onclick="event.stopPropagation()" style="color:var(--blue);text-decoration:none">' + esc(short(r.doi, 24)) + '</a>' : '—';
-    return '<tr onclick="showDetail(' + idx + ')">' +
-      '<td>' + vBadge + '</td>' +
-      '<td class="doi">' + doiLink + '</td>' +
-      '<td title="' + esc(r.donor) + '">' + esc(short(r.donor, 16)) + '</td>' +
-      '<td title="' + esc(r.acceptor) + '">' + esc(short(r.acceptor, 16)) + '</td>' +
-      '<td>' + esc(short(r.d_a_ratio, 8)) + '</td>' +
-      '<td class="num">' + fmtNum(r.voc) + '</td>' +
-      '<td class="num">' + fmtNum(r.jsc) + '</td>' +
-      '<td class="num">' + fmtNum(r.ff) + '</td>' +
-      '<td class="num" style="font-weight:600;color:var(--green)">' + fmtNum(r.pce) + '</td>' +
-      '<td title="' + esc(r.additive) + '">' + esc(short(r.additive, 12)) + '</td>' +
-      '<td title="' + esc(r.device_structure) + '">' + esc(short(r.device_structure, 14)) + '</td>' +
-      '<td title="' + esc(r.source_table) + '">' + esc(short(r.source_table, 12)) + '</td>' +
-    '</tr>';
-  }).join('');
-
-  renderPagination();
-}
-
-/* ══════════════════════════════════════
-   Pagination
-   ══════════════════════════════════════ */
-function renderPagination() {
-  const pages = Math.ceil(filtered.length / perPage) || 1;
-  const el = document.getElementById('pagination');
-  if (pages <= 1) { el.innerHTML = ''; return; }
-  let html = '<button onclick="goPage(1)" ' + (currentPage===1?'disabled':'') + '>«</button>';
-  html += '<button onclick="goPage(' + (currentPage-1) + ')" ' + (currentPage===1?'disabled':'') + '>‹</button>';
-  const start = Math.max(1, currentPage - 3);
-  const end = Math.min(pages, currentPage + 3);
-  for (let p = start; p <= end; p++) {
-    html += '<button onclick="goPage(' + p + ')" class="' + (p===currentPage?'active':'') + '">' + p + '</button>';
-  }
-  html += '<span class="page-info">' + currentPage + ' / ' + pages + '</span>';
-  html += '<button onclick="goPage(' + (currentPage+1) + ')" ' + (currentPage===pages?'disabled':'') + '>›</button>';
-  html += '<button onclick="goPage(' + pages + ')" ' + (currentPage===pages?'disabled':'') + '>»</button>';
-  el.innerHTML = html;
-}
-
-function goPage(p) {
-  const pages = Math.ceil(filtered.length / perPage) || 1;
-  currentPage = Math.max(1, Math.min(pages, p));
-  renderTable();
-  window.scrollTo({ top: document.querySelector('.table-wrap').offsetTop - 60, behavior: 'smooth' });
-}
-
-/* ══════════════════════════════════════
-   Detail Modal
-   ══════════════════════════════════════ */
-function showDetail(idx) {
-  const r = filtered[idx];
-  if (!r) return;
-
-  const fields = [
-    ['DOI', r.doi ? '<a href="https://doi.org/' + esc(r.doi) + '" target="_blank" style="color:var(--blue)">' + esc(r.doi) + '</a>' : '—'],
-    ['Donor', r.donor], ['Acceptor', r.acceptor],
-    ['Donor SMILES', r.donor_smiles], ['Acceptor SMILES', r.acceptor_smiles],
-    ['__section', 'Performance'],
-    ['Voc (V)', fmtNum(r.voc)], ['Jsc (mA/cm²)', fmtNum(r.jsc)],
-    ['FF', fmtNum(r.ff)], ['PCE (%)', fmtNum(r.pce)],
-    ['PCE avg (%)', fmtNum(r.pce_avg)], ['PCE best (%)', fmtNum(r.pce_best)],
-    ['__section', 'Energy Levels'],
-    ['HOMO_D (eV)', fmtNum(r.homo_d)], ['LUMO_D (eV)', fmtNum(r.lumo_d)],
-    ['Ehl_D (eV)', fmtNum(r.ehl_d)], ['Eg_D (eV)', fmtNum(r.eg_d)],
-    ['HOMO_A (eV)', fmtNum(r.homo_a)], ['LUMO_A (eV)', fmtNum(r.lumo_a)],
-    ['Ehl_A (eV)', fmtNum(r.ehl_a)], ['Eg_A (eV)', fmtNum(r.eg_a)],
-    ['__section', 'Device Information'],
-    ['D:A Ratio', r.d_a_ratio], ['Additive', r.additive],
-    ['Device Structure', r.device_structure], ['ETL', r.etl],
-    ['HTL', r.htl], ['Active Layer Thickness (nm)', fmtNum(r.active_layer_thickness)],
-    ['Solvent', r.solvent], ['Annealing Temp (°C)', fmtNum(r.annealing_temp)],
-    ['__section', 'Metadata'],
-    ['Source', r.source_table], ['Verified', r.verified === 'YES' ? '<span style="color:var(--green)">✓ YES</span>' : 'NO'],
-  ];
-
-  const extra = r.extra_columns || {};
-  const extraKeys = Object.keys(extra);
-  if (extraKeys.length) {
-    fields.push(['__section', 'Additional Data']);
-    extraKeys.forEach(k => fields.push([k, extra[k]]));
-    if (extraKeys.length % 2 !== 0) fields.push(['', '']);
-  }
-
-  let html = '<div class="detail-grid">';
-  fields.forEach(([label, value]) => {
-    if (label === '__section') {
-      html += '<div class="detail-section">' + esc(value) + '</div>';
-    } else if (label === 'DOI' || label === 'Verified') {
-      html += '<div class="detail-item"><div class="detail-label">' + esc(label) + '</div><div class="detail-value">' + (value || '—') + '</div></div>';
-    } else {
-      html += '<div class="detail-item"><div class="detail-label">' + esc(label) + '</div><div class="detail-value">' + esc(value || '—') + '</div></div>';
+    function layerLabel(record) {
+      if (record.strict_molecular_benchmark) return '<span class="pill green">Strict molecular</span>';
+      if (record.strict_performance_benchmark) return '<span class="pill blue">Strict performance</span>';
+      if (record.performance_grade) return '<span class="pill amber">Performance grade</span>';
+      if (record.performance_ready) return '<span class="pill purple">Performance ready</span>';
+      return '<span class="pill">Full only</span>';
     }
-  });
-  html += '</div>';
 
-  document.getElementById('detailTitle').textContent = '📋 ' + short(r.donor || '?', 20) + ' / ' + short(r.acceptor || '?', 20);
-  document.getElementById('detailBody').innerHTML = html;
-  document.getElementById('detailModal').classList.add('show');
-}
+    function errorPill(record) {
+      const bucket = record.pce_error_bucket || "unchecked";
+      if (bucket === "<=2%") return '<span class="pill green">&lt;=2%</span>';
+      if (bucket === "2-5%") return '<span class="pill blue">2-5%</span>';
+      if (bucket === "5-10%") return '<span class="pill amber">5-10%</span>';
+      if (bucket === ">10%") return '<span class="pill red">&gt;10%</span>';
+      return '<span class="pill">Unchecked</span>';
+    }
 
-function closeDetail() { document.getElementById('detailModal').classList.remove('show'); }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
+    async function loadData() {
+      try {
+        const response = await fetch("opv_data.json", { cache: "no-cache" });
+        allData = await response.json();
+        filtered = [...allData];
+        $("loadingPanel").style.display = "none";
+        $("app").style.display = "";
+        const first = allData[0] || {};
+        $("releaseId").textContent = first.release_id || "OPV-DB frozen release";
+        const lastModified = response.headers.get("Last-Modified");
+        $("updatedPill").textContent = lastModified ? "Updated " + new Date(lastModified).toLocaleDateString() : "Static JSON";
+        renderStats();
+        renderSummaryBars();
+        applyFilters();
+      } catch (err) {
+        $("loadingPanel").innerHTML = '<span class="error">Failed to load opv_data.json: ' + esc(err.message) + '</span>';
+      }
+    }
 
-/* ══════════════════════════════════════
-   CSV Download
-   ══════════════════════════════════════ */
-const CSV_COLS = ['doi','donor','acceptor','donor_smiles','acceptor_smiles','voc','jsc','ff','pce','pce_avg','pce_best','homo_d','lumo_d','ehl_d','eg_d','homo_a','lumo_a','ehl_a','eg_a','d_a_ratio','additive','device_structure','etl','htl','active_layer_thickness','solvent','annealing_temp','source_table','verified'];
+    function renderStats() {
+      const total = allData.length;
+      const doiCount = uniqueCount(allData, "doi_norm");
+      const strictPerformance = allData.filter((r) => r.strict_performance_benchmark).length;
+      const strictMolecular = allData.filter((r) => r.strict_molecular_benchmark).length;
+      const allFour = allData.filter((r) => r.has_all_four_metrics).length;
+      const bothSmiles = allData.filter((r) => r.has_both_smiles).length;
+      const stats = [
+        ["Full archive", total, "all transparent records", "blue"],
+        ["Source DOIs", doiCount, "record-level provenance", "teal"],
+        ["Strict performance", strictPerformance, pctText(strictPerformance, total), "green"],
+        ["Strict molecular", strictMolecular, pctText(strictMolecular, total), "purple"],
+        ["All four metrics", allFour, pctText(allFour, total), "amber"],
+        ["Paired SMILES", bothSmiles, pctText(bothSmiles, total), "gray"],
+      ];
+      $("statsGrid").innerHTML = stats.map(([label, value, sub, cls]) => (
+        '<div class="stat ' + cls + '"><div class="label">' + esc(label) + '</div><div class="value">' +
+        fmtInt(value) + '</div><div class="sub">' + esc(sub) + '</div></div>'
+      )).join("");
+    }
 
-function buildCSV(data) {
-  const header = CSV_COLS.join(',');
-  const rows = data.map(r => CSV_COLS.map(c => {
-    let v = r[c] ?? '';
-    v = String(v);
-    if (v.includes(',') || v.includes('"') || v.includes('\n')) v = '"' + v.replace(/"/g, '""') + '"';
-    return v;
-  }).join(','));
-  return header + '\n' + rows.join('\n');
-}
+    function pctText(value, total) {
+      return total ? (value / total * 100).toFixed(1) + "% of full archive" : "";
+    }
 
-function triggerDownload(blob, filename) {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
+    function barRow(label, value, total, colorClass = "") {
+      const pct = total ? Math.max(0, Math.min(100, value / total * 100)) : 0;
+      return '<div class="bar-row"><div class="bar-label">' + esc(label) + '</div><div class="bar-track"><div class="bar-fill ' +
+        colorClass + '" style="width:' + pct.toFixed(2) + '%"></div></div><div class="bar-value">' +
+        fmtInt(value) + '</div></div>';
+    }
 
-/* --- Header: Download ALL --- */
-function downloadAllCSV() {
-  const blob = new Blob(['\ufeff' + buildCSV(allData)], { type: 'text/csv;charset=utf-8' });
-  triggerDownload(blob, 'OPV_Database.csv');
-}
-function downloadAllJSON() {
-  const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
-  triggerDownload(blob, 'OPV_Database.json');
-}
+    function renderSummaryBars() {
+      const total = allData.length;
+      const checked = allData.filter((r) => r.has_all_four_metrics).length;
+      const tiers = [
+        ["Full archive", total, "blue"],
+        ["All four metrics", checked, "teal"],
+        ["Performance ready", allData.filter((r) => r.performance_ready).length, "purple"],
+        ["Performance grade", allData.filter((r) => r.performance_grade).length, "amber"],
+        ["Strict performance", allData.filter((r) => r.strict_performance_benchmark).length, "green"],
+        ["Strict molecular", allData.filter((r) => r.strict_molecular_benchmark).length, "green"],
+      ];
+      $("tierBars").innerHTML = tiers.map(([label, value, color]) => barRow(label, value, total, color)).join("");
 
-/* --- Toolbar: Download FILTERED --- */
-function downloadFilteredCSV() {
-  const blob = new Blob(['\ufeff' + buildCSV(filtered)], { type: 'text/csv;charset=utf-8' });
-  triggerDownload(blob, 'OPV_Database_filtered.csv');
-}
-function downloadFilteredJSON() {
-  const blob = new Blob([JSON.stringify(filtered, null, 2)], { type: 'application/json' });
-  triggerDownload(blob, 'OPV_Database_filtered.json');
-}
+      const pce2 = allData.filter((r) => r.pce_error_bucket === "<=2%").length;
+      const pce10 = allData.filter((r) => ["<=2%", "2-5%", "5-10%"].includes(r.pce_error_bucket)).length;
+      const quality = [
+        ["PCE error <=2%", pce2, checked, "green"],
+        ["PCE error <=10%", pce10, checked, "teal"],
+        ["Both SMILES", allData.filter((r) => r.has_both_smiles).length, total, "purple"],
+        ["Device stack", allData.filter((r) => isFilled(r.device_structure)).length, total, "blue"],
+        ["Solvent", allData.filter((r) => isFilled(r.solvent)).length, total, "amber"],
+        ["Manual audit sample", allData.filter((r) => r.manual_validation_sample).length, total, "red"],
+      ];
+      $("qualityBars").innerHTML = quality.map(([label, value, denominator, color]) => barRow(label, value, denominator, color)).join("");
+    }
 
-document.getElementById('downloadAllCsvBtn').addEventListener('click', e => { e.preventDefault(); downloadAllCSV(); });
-document.getElementById('downloadAllJsonBtn').addEventListener('click', e => { e.preventDefault(); downloadAllJSON(); });
+    function applyFilters() {
+      const search = $("searchInput").value.trim().toLowerCase();
+      const layer = $("layerFilter").value;
+      const pceMin = Number.parseFloat($("pceMin").value);
+      const pceMax = Number.parseFloat($("pceMax").value);
+      const error = $("errorFilter").value;
+      const smiles = $("smilesFilter").value;
+      const process = $("processFilter").value;
 
-function updateFilteredDownloadBtns() {
-  const isFiltered = filtered.length && filtered.length !== allData.length;
-  const csvBtn = document.getElementById('downloadFilteredCsvBtn');
-  const jsonBtn = document.getElementById('downloadFilteredJsonBtn');
-  csvBtn.style.display = isFiltered ? '' : 'none';
-  jsonBtn.style.display = isFiltered ? '' : 'none';
-  if (isFiltered) {
-    csvBtn.textContent = '📤 Export CSV (' + filtered.length + ')';
-    jsonBtn.textContent = '📦 Export JSON (' + filtered.length + ')';
-  }
-}
+      filtered = allData.filter((r) => {
+        if (search) {
+          const haystack = [r.doi, r.donor, r.acceptor, r.donor_canonical, r.acceptor_canonical, r.donor_smiles, r.acceptor_smiles, r.device_structure, r.solvent, r.additive].join(" ").toLowerCase();
+          if (!haystack.includes(search)) return false;
+        }
+        if (layer === "strict_performance_benchmark" && !r.strict_performance_benchmark) return false;
+        if (layer === "strict_molecular_benchmark" && !r.strict_molecular_benchmark) return false;
+        if (layer === "performance_grade" && !r.performance_grade) return false;
+        if (layer === "performance_ready" && !r.performance_ready) return false;
+        if (layer === "full_archive_only" && r.performance_ready) return false;
+        if (Number.isFinite(pceMin) && (!Number.isFinite(Number(r.pce)) || Number(r.pce) < pceMin)) return false;
+        if (Number.isFinite(pceMax) && (!Number.isFinite(Number(r.pce)) || Number(r.pce) > pceMax)) return false;
+        if (error && r.pce_error_bucket !== error) return false;
+        if (smiles === "both" && !r.has_both_smiles) return false;
+        if (smiles === "missing" && r.has_both_smiles) return false;
+        if (process === "device_structure" && !isFilled(r.device_structure)) return false;
+        if (process === "solvent" && !isFilled(r.solvent)) return false;
+        if (process === "additive" && !isFilled(r.additive)) return false;
+        if (process === "thickness" && !isFilled(r.active_layer_thickness)) return false;
+        if (process === "annealing" && !isFilled(r.annealing_temp)) return false;
+        return true;
+      });
+      currentPage = 1;
+      sortRows();
+      renderTable();
+    }
 
-/* ══════════════════════════════════════
-   Init
-   ══════════════════════════════════════ */
-loadData();
-</script>
+    function clearFilters() {
+      ["searchInput", "layerFilter", "pceMin", "pceMax", "errorFilter", "smilesFilter", "processFilter"].forEach((id) => { $(id).value = ""; });
+      applyFilters();
+    }
+
+    function sortRows() {
+      filtered.sort((a, b) => {
+        let va = a[sortKey];
+        let vb = b[sortKey];
+        const na = Number(va);
+        const nb = Number(vb);
+        if (Number.isFinite(na) || Number.isFinite(nb)) {
+          va = Number.isFinite(na) ? na : (sortAsc ? Infinity : -Infinity);
+          vb = Number.isFinite(nb) ? nb : (sortAsc ? Infinity : -Infinity);
+        } else {
+          va = String(va ?? "").toLowerCase();
+          vb = String(vb ?? "").toLowerCase();
+        }
+        if (va < vb) return sortAsc ? -1 : 1;
+        if (va > vb) return sortAsc ? 1 : -1;
+        return 0;
+      });
+    }
+
+    function renderTable() {
+      const pages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+      currentPage = Math.max(1, Math.min(currentPage, pages));
+      const start = (currentPage - 1) * PER_PAGE;
+      const pageRows = filtered.slice(start, start + PER_PAGE);
+      $("tableInfo").textContent = fmtInt(filtered.length) + " / " + fmtInt(allData.length) + " records";
+      $("pageStatus").textContent = "Page " + currentPage + " of " + pages;
+      $("rows").innerHTML = pageRows.map((r, i) => {
+        const idx = start + i;
+        const doi = r.doi ? '<a href="https://doi.org/' + esc(r.doi) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">' + esc(short(r.doi, 25)) + '</a>' : "-";
+        return '<tr data-index="' + idx + '">' +
+          '<td class="layer-cell">' + layerLabel(r) + '</td>' +
+          '<td class="doi-cell">' + doi + '</td>' +
+          '<td class="num">' + esc(r.publish_year ?? "-") + '</td>' +
+          '<td title="' + esc(r.donor || "") + '">' + esc(short(r.donor, 18)) + '</td>' +
+          '<td title="' + esc(r.acceptor || "") + '">' + esc(short(r.acceptor, 18)) + '</td>' +
+          '<td class="num"><strong>' + fmtNum(r.pce) + '</strong></td>' +
+          '<td class="num">' + fmtNum(r.voc, 3) + '</td>' +
+          '<td class="num">' + fmtNum(r.jsc) + '</td>' +
+          '<td class="num">' + fmtNum(r.ff) + '</td>' +
+          '<td>' + errorPill(r) + '</td>' +
+          '<td>' + (r.has_both_smiles ? '<span class="pill green">Both</span>' : '<span class="pill">Missing</span>') + '</td>' +
+          '<td title="' + esc(r.device_structure || r.device_type || "") + '">' + esc(short(r.device_type || r.device_structure, 16)) + '</td>' +
+          '<td title="' + esc(r.solvent || "") + '">' + esc(short(r.solvent, 14)) + '</td>' +
+          '<td title="' + esc(r.additive || "") + '">' + esc(short(r.additive, 14)) + '</td>' +
+        '</tr>';
+      }).join("");
+      Array.from(document.querySelectorAll("#rows tr")).forEach((row) => {
+        row.addEventListener("click", () => showDetail(Number(row.dataset.index)));
+      });
+      renderPagination(pages);
+    }
+
+    function renderPagination(pages) {
+      const items = [];
+      items.push('<button type="button" ' + (currentPage === 1 ? "disabled" : "") + ' data-page="1">First</button>');
+      items.push('<button type="button" ' + (currentPage === 1 ? "disabled" : "") + ' data-page="' + (currentPage - 1) + '">Prev</button>');
+      const from = Math.max(1, currentPage - 2);
+      const to = Math.min(pages, currentPage + 2);
+      for (let page = from; page <= to; page++) {
+        items.push('<button type="button" class="' + (page === currentPage ? "active" : "") + '" data-page="' + page + '">' + page + '</button>');
+      }
+      items.push('<button type="button" ' + (currentPage === pages ? "disabled" : "") + ' data-page="' + (currentPage + 1) + '">Next</button>');
+      items.push('<button type="button" ' + (currentPage === pages ? "disabled" : "") + ' data-page="' + pages + '">Last</button>');
+      $("pagination").innerHTML = items.join("");
+      Array.from($("pagination").querySelectorAll("button")).forEach((button) => {
+        button.addEventListener("click", () => {
+          const page = Number(button.dataset.page);
+          if (Number.isFinite(page)) {
+            currentPage = page;
+            renderTable();
+          }
+        });
+      });
+    }
+
+    function showDetail(index) {
+      const r = filtered[index];
+      if (!r) return;
+      $("detailTitle").textContent = (r.donor || "Unknown donor") + " / " + (r.acceptor || "Unknown acceptor");
+      const fields = [
+        ["Layer", layerLabel(r)],
+        ["DOI", r.doi ? '<a href="https://doi.org/' + esc(r.doi) + '" target="_blank" rel="noopener">' + esc(r.doi) + '</a>' : "-"],
+        ["Publisher metadata", (r.metadata_join_status || "-") + (r.publisher_group ? " / " + r.publisher_group : "")],
+        ["Donor", r.donor],
+        ["Acceptor", r.acceptor],
+        ["Canonical names", [r.donor_canonical, r.acceptor_canonical].filter(isFilled).join(" / ")],
+        ["PCE / Voc / Jsc / FF", [fmtNum(r.pce), fmtNum(r.voc, 3), fmtNum(r.jsc), fmtNum(r.ff)].join(" / ")],
+        ["PCE recomputed", fmtNum(r.pce_recomputed)],
+        ["PCE relative error", isFilled(r.pce_relative_error_percent) ? fmtNum(r.pce_relative_error_percent, 3) + "%" : "-"],
+        ["PCE avg / best", [fmtNum(r.pce_avg), fmtNum(r.pce_best)].join(" / ")],
+        ["Device structure", r.device_structure],
+        ["ETL / HTL", [r.etl, r.htl].filter(isFilled).join(" / ")],
+        ["Solvent", r.solvent],
+        ["Additive", [r.additive, r.additive_ratio].filter(isFilled).join(" / ")],
+        ["D:A ratio", r.d_a_ratio],
+        ["Thickness / annealing", [fmtNum(r.active_layer_thickness), fmtNum(r.annealing_temp)].join(" / ")],
+        ["HOMO/LUMO donor", [fmtNum(r.homo_d), fmtNum(r.lumo_d)].join(" / ")],
+        ["HOMO/LUMO acceptor", [fmtNum(r.homo_a), fmtNum(r.lumo_a)].join(" / ")],
+        ["Source table", r.source_table],
+        ["Review state", r.verified],
+        ["Manual audit sample", r.manual_validation_sample ? [r.manual_validation_sample_id, r.manual_validation_group, r.manual_validation_status].filter(isFilled).join(" / ") : "-"],
+        ["Donor SMILES", r.donor_smiles],
+        ["Acceptor SMILES", r.acceptor_smiles],
+      ];
+      $("detailBody").innerHTML = '<div class="detail-grid">' + fields.map(([label, value]) => {
+        const wide = String(value || "").length > 90 || label.includes("SMILES") || label === "Source table";
+        const raw = label === "Layer" || label === "DOI";
+        return '<div class="detail-card ' + (wide ? "wide" : "") + '"><div class="detail-label">' + esc(label) + '</div><div class="detail-value">' + (raw ? (value || "-") : esc(value || "-")) + '</div></div>';
+      }).join("") + '</div>';
+      $("detailModal").classList.add("show");
+    }
+
+    function closeDetail() { $("detailModal").classList.remove("show"); }
+
+    const CSV_COLUMNS = [
+      "id", "doi", "doi_norm", "publish_year", "publisher_group", "primary_layer",
+      "strict_performance_benchmark", "strict_molecular_benchmark",
+      "donor", "acceptor", "donor_canonical", "acceptor_canonical",
+      "donor_smiles", "acceptor_smiles", "voc", "jsc", "ff", "pce",
+      "pce_recomputed", "pce_relative_error_percent", "pce_avg", "pce_best",
+      "d_a_ratio", "additive", "additive_ratio", "device_structure", "device_type",
+      "etl", "htl", "active_layer_thickness", "solvent", "annealing_temp",
+      "homo_d", "lumo_d", "homo_a", "lumo_a", "source_table", "verified"
+    ];
+
+    function csvEscape(value) {
+      let text = value === null || value === undefined ? "" : String(value);
+      if (/[",\n\r]/.test(text)) text = '"' + text.replace(/"/g, '""') + '"';
+      return text;
+    }
+    function buildCsv(rows) {
+      return CSV_COLUMNS.join(",") + "\n" + rows.map((row) => CSV_COLUMNS.map((col) => csvEscape(row[col])).join(",")).join("\n");
+    }
+    function downloadBlob(content, filename, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    $("applyBtn").addEventListener("click", applyFilters);
+    $("clearBtn").addEventListener("click", clearFilters);
+    $("exportFilteredCsvBtn").addEventListener("click", () => downloadBlob("\ufeff" + buildCsv(filtered), "OPV-DB_filtered.csv", "text/csv;charset=utf-8"));
+    $("downloadCsvBtn").addEventListener("click", () => downloadBlob("\ufeff" + buildCsv(allData), "OPV-DB_full_archive.csv", "text/csv;charset=utf-8"));
+    $("downloadJsonBtn").addEventListener("click", () => downloadBlob(JSON.stringify(allData), "OPV-DB_full_archive.json", "application/json"));
+    $("closeModalBtn").addEventListener("click", closeDetail);
+    $("detailModal").addEventListener("click", (event) => { if (event.target.id === "detailModal") closeDetail(); });
+    document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeDetail(); });
+    ["searchInput", "layerFilter", "pceMin", "pceMax", "errorFilter", "smilesFilter", "processFilter"].forEach((id) => {
+      $(id).addEventListener("keydown", (event) => { if (event.key === "Enter") applyFilters(); });
+      if (id !== "searchInput") $(id).addEventListener("change", applyFilters);
+    });
+    Array.from(document.querySelectorAll("th[data-sort]")).forEach((th) => {
+      th.addEventListener("click", () => {
+        const key = th.dataset.sort;
+        if (sortKey === key) sortAsc = !sortAsc;
+        else {
+          sortKey = key;
+          sortAsc = !["pce", "voc", "jsc", "ff", "pce_relative_error_percent", "publish_year", "has_both_smiles"].includes(key);
+        }
+        sortRows();
+        renderTable();
+      });
+    });
+
+    loadData();
+  </script>
 </body>
 </html>
