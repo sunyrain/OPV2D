@@ -602,7 +602,7 @@
 
     async function loadData() {
       try {
-        const response = await fetch("opv_data.json?v=20260623_pce_gt30_quarantine", { cache: "reload" });
+        const response = await fetch("opv_data.json?v=20260624_single_junction_public_scope", { cache: "reload" });
         allData = await response.json();
         filtered = [...allData];
         $("loadingPanel").style.display = "none";
@@ -627,7 +627,7 @@
       const allFour = allData.filter((r) => r.has_all_four_metrics).length;
       const bothSmiles = allData.filter((r) => r.has_both_smiles).length;
       const stats = [
-        ["Full archive", total, "all transparent records", "blue"],
+        ["Full archive", total, "publication-facing records", "blue"],
         ["Source DOIs", doiCount, "record-level provenance", "teal"],
         ["Strict performance", strictPerformance, pctText(strictPerformance, total), "green"],
         ["Strict molecular", strictMolecular, pctText(strictMolecular, total), "purple"],
