@@ -602,7 +602,7 @@
 
     async function loadData() {
       try {
-        const response = await fetch("opv_data.json?v=20260625_release_v1_schema40", { cache: "reload" });
+        const response = await fetch("opv_data.json?v=20260625_release_v1_exp_only", { cache: "reload" });
         allData = await response.json();
         filtered = [...allData];
         $("loadingPanel").style.display = "none";
