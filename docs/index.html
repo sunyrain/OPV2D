@@ -451,8 +451,6 @@
                 <option value="">All records</option>
                 <option value="strict_performance_benchmark" selected>Strict performance</option>
                 <option value="strict_molecular_benchmark">Strict molecular</option>
-                <option value="performance_grade">Performance grade</option>
-                <option value="performance_ready">Performance ready</option>
                 <option value="full_archive_only">Full archive only</option>
               </select>
             </div>
@@ -586,8 +584,6 @@
     function layerLabel(record) {
       if (record.strict_molecular_benchmark) return '<span class="pill green">Strict molecular</span>';
       if (record.strict_performance_benchmark) return '<span class="pill blue">Strict performance</span>';
-      if (record.performance_grade) return '<span class="pill amber">Performance grade</span>';
-      if (record.performance_ready) return '<span class="pill purple">Performance ready</span>';
       return '<span class="pill">Full only</span>';
     }
 
@@ -602,7 +598,7 @@
 
     async function loadData() {
       try {
-        const response = await fetch("opv_data.json?v=20260625_release_v1_public_schema", { cache: "reload" });
+        const response = await fetch("opv_data.json?v=20260706_scidata_release_v1", { cache: "reload" });
         allData = await response.json();
         filtered = [...allData];
         $("loadingPanel").style.display = "none";
@@ -657,8 +653,6 @@
       const tiers = [
         ["Full archive", total, "blue"],
         ["All four metrics", checked, "teal"],
-        ["Performance ready", allData.filter((r) => r.performance_ready).length, "purple"],
-        ["Performance grade", allData.filter((r) => r.performance_grade).length, "amber"],
         ["Strict performance", allData.filter((r) => r.strict_performance_benchmark).length, "green"],
         ["Strict molecular", allData.filter((r) => r.strict_molecular_benchmark).length, "green"],
       ];
@@ -672,7 +666,7 @@
         ["Both SMILES", allData.filter((r) => r.has_both_smiles).length, total, "purple"],
         ["Device stack", allData.filter((r) => isFilled(r.device_structure)).length, total, "blue"],
         ["Solvent", allData.filter((r) => isFilled(r.solvent)).length, total, "amber"],
-        ["Manual audit sample", allData.filter((r) => r.manual_validation_sample).length, total, "red"],
+        ["Additive", allData.filter((r) => isFilled(r.additive)).length, total, "red"],
       ];
       $("qualityBars").innerHTML = quality.map(([label, value, denominator, color]) => barRow(label, value, denominator, color)).join("");
     }
@@ -693,9 +687,7 @@
         }
         if (layer === "strict_performance_benchmark" && !r.strict_performance_benchmark) return false;
         if (layer === "strict_molecular_benchmark" && !r.strict_molecular_benchmark) return false;
-        if (layer === "performance_grade" && !r.performance_grade) return false;
-        if (layer === "performance_ready" && !r.performance_ready) return false;
-        if (layer === "full_archive_only" && r.performance_ready) return false;
+        if (layer === "full_archive_only" && r.strict_performance_benchmark) return false;
         if (Number.isFinite(pceMin) && (!Number.isFinite(Number(r.pce)) || Number(r.pce) < pceMin)) return false;
         if (Number.isFinite(pceMax) && (!Number.isFinite(Number(r.pce)) || Number(r.pce) > pceMax)) return false;
         if (error && r.pce_error_bucket !== error) return false;
@@ -816,9 +808,6 @@
         ["Thickness / annealing", [fmtNum(r.active_layer_thickness), fmtNum(r.annealing_temp)].join(" / ")],
         ["HOMO/LUMO donor", [fmtNum(r.homo_d), fmtNum(r.lumo_d)].join(" / ")],
         ["HOMO/LUMO acceptor", [fmtNum(r.homo_a), fmtNum(r.lumo_a)].join(" / ")],
-        ["Source table", r.source_table],
-        ["Review state", r.verified],
-        ["Manual audit sample", r.manual_validation_sample ? [r.manual_validation_sample_id, r.manual_validation_group, r.manual_validation_status].filter(isFilled).join(" / ") : "-"],
         ["Donor SMILES", r.donor_smiles],
         ["Acceptor SMILES", r.acceptor_smiles],
       ];
@@ -840,7 +829,7 @@
       "pce_recomputed", "pce_relative_error_percent", "pce_avg", "pce_best",
       "d_a_ratio", "additive", "additive_ratio", "device_structure", "device_type",
       "etl", "htl", "active_layer_thickness", "solvent", "annealing_temp",
-      "homo_d", "lumo_d", "homo_a", "lumo_a", "source_table", "verified"
+      "homo_d", "lumo_d", "homo_a", "lumo_a"
     ];
 
     function csvEscape(value) {

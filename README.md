@@ -1,95 +1,50 @@
-# OPV Dataset: Organic Photovoltaic Donor-Acceptor Dataset (OPV2D)
-<img width="2816" height="1536" alt="a0ac3c4804f0987ad77605860664b08a" src="https://github.com/user-attachments/assets/ea0c7a09-e61b-4efd-b83a-d182e130c92b" />
+# OPV-DB Static Browser
 
-> **🌐 Online Database Browser:** [https://sunyrain.github.io/OPV2D/](https://sunyrain.github.io/OPV2D/)
->
-> Search, filter, and download the full dataset interactively — no installation required.
+This repository hosts the public static browser for OPV-DB:
 
-## Overview
+<https://sunyrain.github.io/OPV2D/>
 
-This repository hosts **OPV2D**, a continuously updated dataset for organic photovoltaic (OPV) donor–acceptor (D/A) materials. The dataset integrates previously published OPV datasets and expands them through ongoing manual verification and new data collection. It is designed to support machine learning research, molecular generation, and large-scale OPV screening.
+OPV-DB is a literature-mined organic photovoltaic device performance database.
+The current website mirrors the publication-facing Zenodo release:
 
-The dataset is available in two formats:
+- Data DOI: <https://doi.org/10.5281/zenodo.20841543>
+- Full archive: 38,849 single-junction OPV device records
+- Source DOIs: 7,873 normalized source DOIs
+- Strict performance benchmark: 31,360 records
+- Strict molecular benchmark: 21,720 records
+- All four photovoltaic metrics: 37,452 records
+- Donor and acceptor SMILES: 26,566 records
 
-* **Active_Database.csv** — The full dataset in CSV format. Each entry is annotated with a `checked` field indicating whether it has been manually validated.
-* **[Online Browser](https://sunyrain.github.io/OPV2D/)** — An interactive web interface hosted via GitHub Pages (`docs/` folder), supporting search, filtering, sorting, and CSV/JSON export.
+The web app is served from the `docs/` directory through GitHub Pages. It loads
+`docs/opv_data.json`, which is generated from the archived Zenodo release file
+`opvdb.zip`. The root `Active_Database.csv` is kept as a CSV mirror of the
+public full device archive.
 
-This design allows the dataset to grow organically while maintaining transparent data quality tracking.
+## Files
 
-## Usage
+- `docs/index.html`: static browser interface.
+- `docs/opv_data.json`: browser JSON generated from the public release.
+- `Active_Database.csv`: CSV mirror of `data/opv_devices_full.csv` from the
+  Zenodo release.
 
-This dataset is ideal for:
+## Recommended Citation
 
-* **Machine Learning**: Training predictive models to estimate OPV performance (e.g., PCE, HOMO-LUMO levels) and classify OPV-active materials.
-* **Generative Design**: Using the dataset with generative models to create new OPV materials with optimized properties.
-* **Materials Discovery**: Accelerating the discovery of new donor-acceptor pairs for OPVs by leveraging both the active and verified databases.
-
----
-
-## Citation
-
-If you use this dataset in your research, please cite the following paper:
-```bibtex
-@misc{qiu2025,
-      title={Accelerating High-Efficiency Organic Photovoltaic Discovery via Pretrained Graph Neural Networks and Generative Reinforcement Learning}, 
-      author={Jiangjie Qiu and Hou Hei Lam and Xiuyuan Hu and Wentao Li and Siwei Fu and Fankun Zeng and Hao Zhang and Xiaonan Wang},
-      year={2025},
-      eprint={2503.23766},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2503.23766}, 
-}
-
-@misc{lam2025cyclechemistdualprongedmachinelearning,
-      title={CycleChemist: A Dual-Pronged Machine Learning Framework for Organic Photovoltaic Discovery}, 
-      author={Hou Hei Lam and Jiangjie Qiu and Xiuyuan Hu and Wentao Li and Fankun Zeng and Siwei Fu and Hao Zhang and Xiaonan Wang},
-      year={2025},
-      eprint={2511.19500},
-      archivePrefix={arXiv},
-      primaryClass={cond-mat.mtrl-sci},
-      url={https://arxiv.org/abs/2511.19500}, 
-}
-```
-And cite the original data sources:
+Please cite the archived dataset rather than a mutable website copy:
 
 ```bibtex
-@dataset{li2025opv,
-   author  = {Li, Yuan-Fang},
-   title   = {Training dataset for predicting PCE of organic solar cells},
-   year    = {2025},
-   publisher = {Zenodo},
-   doi     = {10.5281/zenodo.16784519},
-   url     = {https://doi.org/10.5281/zenodo.16784519},
-   note    = {5,628 experimental records of binary OSCs with SMILES and energy levels, CC-BY 4.0}
-}
-
-@article{Min2020,
-   author  = {Wu, Yao and Guo, Jie and Sun, Rui and Min, Jie},
-   title   = {Machine learning for accelerating the discovery of high-performance donor/acceptor pairs in non-fullerene organic solar cells},
-   journal = {npj Computational Materials},
-   volume  = {6},
-   number  = {1},
-   pages   = {120},
-   year    = {2020}
-}
-
-@article{Saeki2021,
-   author  = {Miyake, Yuta and Saeki, Akinori},
-   title   = {Machine Learning-Assisted Development of Organic Solar Cell Materials: Issues, Analyses, and Outlooks},
-   journal = {The Journal of Physical Chemistry Letters},
-   volume  = {12},
-   number  = {51},
-   pages   = {12391-12401},
-   year    = {2021}
+@dataset{qiu2026opvdb,
+  author    = {Qiu, Jiangjie},
+  title     = {OPV-DB: a literature-mined organic photovoltaic device performance database},
+  year      = {2026},
+  publisher = {Zenodo},
+  version   = {1.0.0},
+  doi       = {10.5281/zenodo.20841543},
+  url       = {https://doi.org/10.5281/zenodo.20841543}
 }
 ```
-
----
 
 ## License
 
-This dataset is made publicly available for academic and research purposes. It is distributed under the terms of the MIT License, allowing free usage for research activities.
-
-## Contact
-
-For any further inquiries or to collaborate, please contact Me at whilesunny@gmail.com
+The archived OPV-DB release is distributed under CC BY 4.0. See the Zenodo
+record for the release package, data dictionary, checksums, license statement,
+and third-party attribution notes.
