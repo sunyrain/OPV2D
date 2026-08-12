@@ -380,11 +380,61 @@
     }
     .error { color: var(--red); font-weight: 650; }
     .footer {
-      color: var(--soft);
+      margin-top: 8px;
+      background: #17212b;
+      color: #cbd5e1;
+      border-top: 4px solid var(--teal);
       font-size: 12px;
-      text-align: center;
-      padding: 18px 24px 30px;
     }
+    .footer-inner {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 180px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+    .footer-stat {
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      padding: 13px 14px;
+    }
+    .footer-label {
+      color: #96a4b5;
+      font-size: 10px;
+      font-weight: 760;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .footer-count {
+      min-height: 30px;
+      margin-top: 2px;
+      color: #fff;
+      font-size: 22px;
+      font-variant-numeric: tabular-nums;
+      font-weight: 760;
+    }
+    .footer-count-note { color: #96a4b5; font-size: 10px; }
+    .footer-citations { display: grid; gap: 8px; }
+    .footer-heading {
+      margin: 0 0 2px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 760;
+      letter-spacing: 0.03em;
+    }
+    .citation-item {
+      display: grid;
+      grid-template-columns: 108px minmax(0, 1fr);
+      gap: 10px;
+      align-items: baseline;
+      line-height: 1.45;
+    }
+    .citation-label { color: #96a4b5; font-weight: 700; }
+    .citation-text { color: #d8e0e8; }
+    .citation-text a { color: #73c8c3; }
 
     @media (max-width: 1180px) {
       .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -399,6 +449,8 @@
       .toolbar { grid-template-columns: 1fr 1fr; }
       .detail-grid { grid-template-columns: 1fr; }
       .bar-row { grid-template-columns: 130px minmax(70px, 1fr) 72px; }
+      .footer-inner { grid-template-columns: 1fr; gap: 18px; }
+      .citation-item { grid-template-columns: 1fr; gap: 2px; }
     }
   </style>
 </head>
@@ -555,7 +607,28 @@
   </div>
 
   <footer class="footer">
-    OPV-DB static browser. Record-level source DOIs are provided for provenance; publisher article assets are not redistributed.
+    <div class="footer-inner">
+      <div class="footer-stat">
+        <div class="footer-label">Page views</div>
+        <div class="footer-count" id="pageViewCount" aria-live="polite">&mdash;</div>
+        <div class="footer-count-note">Since August 2026</div>
+      </div>
+      <div class="footer-citations">
+        <h2 class="footer-heading">Dataset and related work</h2>
+        <div class="citation-item">
+          <div class="citation-label">Zenodo dataset</div>
+          <div class="citation-text">Qiu, J. (2026). <em>OPV-DB: a literature-mined organic photovoltaic device performance database</em> (v1.0.0). Zenodo. <a href="https://doi.org/10.5281/zenodo.20841543" target="_blank" rel="noopener">doi:10.5281/zenodo.20841543</a></div>
+        </div>
+        <div class="citation-item">
+          <div class="citation-label">AAAI 2026</div>
+          <div class="citation-text">Lam, H. H., Qiu, J., Hu, X., et al. <em>CycleChemist: A Dual-Pronged Machine Learning Framework for Organic Photovoltaic Discovery.</em> Proc. AAAI Conf. Artif. Intell. 40, 38799&ndash;38807 (2026). <a href="https://doi.org/10.1609/aaai.v40i45.41224" target="_blank" rel="noopener">doi:10.1609/aaai.v40i45.41224</a></div>
+        </div>
+        <div class="citation-item">
+          <div class="citation-label">ICLR Workshop 2025</div>
+          <div class="citation-text">Qiu, J., Lam, H. H., Hu, X., et al. <em>Accelerating High-Efficiency Organic Photovoltaic Discovery via Pretrained Graph Neural Networks and Generative Reinforcement Learning.</em> AI4MAT Workshop at ICLR (2025). <a href="https://openreview.net/forum?id=hvsO7Ws4GC" target="_blank" rel="noopener">OpenReview</a></div>
+        </div>
+      </div>
+    </div>
   </footer>
 
   <script>
@@ -638,6 +711,34 @@
 
     function pctText(value, total) {
       return total ? (value / total * 100).toFixed(1) + "% of full archive" : "";
+    }
+
+    async function loadPageViews() {
+      const counter = $("pageViewCount");
+      const liveSite = window.location.hostname === "sunyrain.github.io";
+      const endpoint = "https://counterapi.com/api/sunyrain.github.io/view/opv2d-home" +
+        (liveSite ? "" : "?readOnly=true");
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 8000);
+
+      try {
+        const response = await fetch(endpoint, {
+          cache: "no-store",
+          credentials: "omit",
+          referrerPolicy: "no-referrer",
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error("Counter request failed");
+        const payload = await response.json();
+        const value = Number(payload.value);
+        if (!Number.isFinite(value)) throw new Error("Invalid counter response");
+        counter.textContent = value.toLocaleString();
+      } catch (err) {
+        counter.textContent = "Unavailable";
+        counter.style.fontSize = "13px";
+      } finally {
+        window.clearTimeout(timeout);
+      }
     }
 
     function barRow(label, value, total, colorClass = "") {
@@ -876,6 +977,7 @@
     });
 
     loadData();
+    loadPageViews();
   </script>
 </body>
 </html>
