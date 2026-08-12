@@ -417,7 +417,7 @@
       font-weight: 760;
     }
     .footer-count-note { color: #96a4b5; font-size: 10px; }
-    .footer-citations { display: grid; gap: 8px; }
+    .footer-citations { display: grid; gap: 10px; }
     .footer-heading {
       margin: 0 0 2px;
       color: #fff;
@@ -425,22 +425,56 @@
       font-weight: 760;
       letter-spacing: 0.03em;
     }
-    .citation-item {
+    .citation-list {
       display: grid;
-      grid-template-columns: 108px minmax(0, 1fr);
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr) minmax(0, 1.45fr);
       gap: 10px;
-      align-items: baseline;
-      line-height: 1.45;
     }
-    .citation-label { color: #96a4b5; font-weight: 700; }
-    .citation-text { color: #d8e0e8; }
-    .citation-text a { color: #73c8c3; }
+    .citation-item {
+      position: relative;
+      min-width: 0;
+      padding: 12px 34px 12px 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .citation-item:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(115,200,195,0.48);
+      text-decoration: none;
+    }
+    .citation-label {
+      color: #73c8c3;
+      font-size: 10px;
+      font-weight: 760;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+    .citation-title {
+      color: #e5edf5;
+      font-size: 12.5px;
+      font-weight: 650;
+      line-height: 1.4;
+    }
+    .citation-arrow {
+      position: absolute;
+      top: 11px;
+      right: 12px;
+      color: #96a4b5;
+      font-size: 13px;
+    }
 
     @media (max-width: 1180px) {
       .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .toolbar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .toolbar .field:first-child { grid-column: 1 / -1; }
       .summary-grid { grid-template-columns: 1fr; }
+      .citation-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
     @media (max-width: 720px) {
       .header-inner, .release-strip { grid-template-columns: 1fr; }
@@ -450,7 +484,7 @@
       .detail-grid { grid-template-columns: 1fr; }
       .bar-row { grid-template-columns: 130px minmax(70px, 1fr) 72px; }
       .footer-inner { grid-template-columns: 1fr; gap: 18px; }
-      .citation-item { grid-template-columns: 1fr; gap: 2px; }
+      .citation-list { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -615,17 +649,22 @@
       </div>
       <div class="footer-citations">
         <h2 class="footer-heading">Dataset and related work</h2>
-        <div class="citation-item">
-          <div class="citation-label">Zenodo dataset</div>
-          <div class="citation-text">Qiu, J. (2026). <em>OPV-DB: a literature-mined organic photovoltaic device performance database</em> (v1.0.0). Zenodo. <a href="https://doi.org/10.5281/zenodo.20841543" target="_blank" rel="noopener">doi:10.5281/zenodo.20841543</a></div>
-        </div>
-        <div class="citation-item">
-          <div class="citation-label">AAAI 2026</div>
-          <div class="citation-text">Lam, H. H., Qiu, J., Hu, X., et al. <em>CycleChemist: A Dual-Pronged Machine Learning Framework for Organic Photovoltaic Discovery.</em> Proc. AAAI Conf. Artif. Intell. 40, 38799&ndash;38807 (2026). <a href="https://doi.org/10.1609/aaai.v40i45.41224" target="_blank" rel="noopener">doi:10.1609/aaai.v40i45.41224</a></div>
-        </div>
-        <div class="citation-item">
-          <div class="citation-label">ICLR Workshop 2025</div>
-          <div class="citation-text">Qiu, J., Lam, H. H., Hu, X., et al. <em>Accelerating High-Efficiency Organic Photovoltaic Discovery via Pretrained Graph Neural Networks and Generative Reinforcement Learning.</em> AI4MAT Workshop at ICLR (2025). <a href="https://openreview.net/forum?id=hvsO7Ws4GC" target="_blank" rel="noopener">OpenReview</a></div>
+        <div class="citation-list">
+          <a class="citation-item" href="https://doi.org/10.5281/zenodo.20841543" target="_blank" rel="noopener">
+            <span class="citation-label">Zenodo dataset</span>
+            <span class="citation-title">OPV-DB: a literature-mined organic photovoltaic device performance database</span>
+            <span class="citation-arrow" aria-hidden="true">&#8599;</span>
+          </a>
+          <a class="citation-item" href="https://doi.org/10.1609/aaai.v40i45.41224" target="_blank" rel="noopener">
+            <span class="citation-label">AAAI 2026</span>
+            <span class="citation-title">CycleChemist: A Dual-Pronged Machine Learning Framework for Organic Photovoltaic Discovery</span>
+            <span class="citation-arrow" aria-hidden="true">&#8599;</span>
+          </a>
+          <a class="citation-item" href="https://openreview.net/forum?id=hvsO7Ws4GC" target="_blank" rel="noopener">
+            <span class="citation-label">ICLR Workshop 2025</span>
+            <span class="citation-title">Accelerating High-Efficiency Organic Photovoltaic Discovery via Pretrained Graph Neural Networks and Generative Reinforcement Learning</span>
+            <span class="citation-arrow" aria-hidden="true">&#8599;</span>
+          </a>
         </div>
       </div>
     </div>
