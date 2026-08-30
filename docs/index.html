@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OPV-DB Literature-Mined Device Database</title>
+  <meta name="description" content="Browse OPV-DB v1.1.0: 39,998 literature-mined organic photovoltaic device records with strict performance and molecular benchmark layers.">
+  <link rel="canonical" href="https://sunyrain.github.io/OPV2D/">
   <style>
     :root {
       --page: #f6f7f9;
@@ -650,8 +652,8 @@
       <div class="footer-citations">
         <h2 class="footer-heading">Dataset and related work</h2>
         <div class="citation-list">
-          <a class="citation-item" href="https://doi.org/10.5281/zenodo.20841543" target="_blank" rel="noopener">
-            <span class="citation-label">Zenodo dataset</span>
+          <a class="citation-item" href="https://doi.org/10.5281/zenodo.22177960" target="_blank" rel="noopener">
+            <span class="citation-label">Zenodo dataset · v1.1.0</span>
             <span class="citation-title">OPV-DB: a literature-mined organic photovoltaic device performance database</span>
             <span class="citation-arrow" aria-hidden="true">&#8599;</span>
           </a>
@@ -673,6 +675,7 @@
   <script>
     const PER_PAGE = 100;
     let allData = [];
+    let releaseMeta = {};
     let filtered = [];
     let currentPage = 1;
     let sortKey = "pce";
@@ -710,15 +713,15 @@
 
     async function loadData() {
       try {
-        const response = await fetch("opv_data.json?v=20260706_scidata_release_v1", { cache: "reload" });
-        allData = await response.json();
+        const response = await fetch("opv_data.json?v=20260830_q3_v1_1", { cache: "reload" });
+        const payload = await response.json();
+        releaseMeta = Array.isArray(payload) ? {} : (payload.release || {});
+        allData = Array.isArray(payload) ? payload : (payload.records || []);
         filtered = [...allData];
         $("loadingPanel").style.display = "none";
         $("app").style.display = "";
-        const first = allData[0] || {};
-        $("releaseId").textContent = first.release_id || "OPV-DB frozen release";
-        const lastModified = response.headers.get("Last-Modified");
-        $("updatedPill").textContent = lastModified ? "Updated " + new Date(lastModified).toLocaleDateString() : "Static JSON";
+        $("releaseId").textContent = releaseMeta.release_id || "OPV-DB frozen release";
+        $("updatedPill").textContent = releaseMeta.release_date ? "Released " + releaseMeta.release_date : "Static JSON";
         renderStats();
         renderSummaryBars();
         applyFilters();
@@ -962,14 +965,13 @@
     function closeDetail() { $("detailModal").classList.remove("show"); }
 
     const CSV_COLUMNS = [
-      "id", "doi", "doi_norm", "publish_year", "publisher_group", "primary_layer",
-      "strict_performance_benchmark", "strict_molecular_benchmark",
-      "donor", "acceptor", "donor_canonical", "acceptor_canonical",
+      "id", "doi", "doi_norm", "donor", "acceptor", "donor_canonical", "acceptor_canonical",
       "donor_smiles", "acceptor_smiles", "voc", "jsc", "ff", "pce",
       "pce_recomputed", "pce_relative_error_percent", "pce_avg", "pce_best",
-      "d_a_ratio", "additive", "additive_ratio", "device_structure", "device_type",
-      "etl", "htl", "active_layer_thickness", "solvent", "annealing_temp",
-      "homo_d", "lumo_d", "homo_a", "lumo_a"
+      "d_a_ratio", "additive", "additive_canonical", "additive_ratio",
+      "device_structure", "device_type", "etl", "etl_canonical", "htl", "htl_canonical",
+      "active_layer_thickness", "solvent", "solvent_canonical", "annealing_temp",
+      "homo_d", "lumo_d", "eg_d", "homo_a", "lumo_a", "eg_a"
     ];
 
     function csvEscape(value) {
@@ -992,9 +994,9 @@
 
     $("applyBtn").addEventListener("click", applyFilters);
     $("clearBtn").addEventListener("click", clearFilters);
-    $("exportFilteredCsvBtn").addEventListener("click", () => downloadBlob("\ufeff" + buildCsv(filtered), "OPV-DB_filtered.csv", "text/csv;charset=utf-8"));
-    $("downloadCsvBtn").addEventListener("click", () => downloadBlob("\ufeff" + buildCsv(allData), "OPV-DB_full_archive.csv", "text/csv;charset=utf-8"));
-    $("downloadJsonBtn").addEventListener("click", () => downloadBlob(JSON.stringify(allData), "OPV-DB_full_archive.json", "application/json"));
+    $("exportFilteredCsvBtn").addEventListener("click", () => downloadBlob("\ufeff" + buildCsv(filtered), "OPV-DB_v1.1.0_filtered.csv", "text/csv;charset=utf-8"));
+    $("downloadCsvBtn").addEventListener("click", () => downloadBlob("\ufeff" + buildCsv(allData), "OPV-DB_v1.1.0_full_archive.csv", "text/csv;charset=utf-8"));
+    $("downloadJsonBtn").addEventListener("click", () => downloadBlob(JSON.stringify({ release: releaseMeta, records: allData }), "OPV-DB_v1.1.0_browser_payload.json", "application/json"));
     $("closeModalBtn").addEventListener("click", closeDetail);
     $("detailModal").addEventListener("click", (event) => { if (event.target.id === "detailModal") closeDetail(); });
     document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeDetail(); });

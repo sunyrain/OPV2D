@@ -1,0 +1,4 @@
+*.md text eol=lf
+*.html text eol=lf
+Active_Database.csv -text
+docs/opv_data.json -text
