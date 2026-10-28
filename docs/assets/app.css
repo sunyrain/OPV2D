@@ -24,9 +24,6 @@ th .unit{font-size:9px;display:block;font-weight:400;text-transform:none;white-s
 .statistic-badge{display:inline-block;max-width:130px;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
 .light-cell small{display:block;font-size:10px;color:var(--muted)}
 .row-details{border:1px solid var(--border);background:white;color:var(--blue);border-radius:5px;padding:3px 7px;font-size:11px;cursor:pointer}
-.badge{display:inline-flex;border:1px solid #cae8d1;background:#eef8f0;color:#216d45;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:650;white-space:nowrap}
-.badge.unknown{color:#8a4e10;background:#fff6e9;border-color:#f0d2a8}
-.badge.outside{color:#5e4b88;background:#f4f0fb;border-color:#ded4ef}
 tbody tr[data-record]{cursor:pointer}
 #page-size{width:65px;min-height:28px;padding:4px 7px;font-size:11px}
 .empty{text-align:center;padding:28px;color:var(--muted)}

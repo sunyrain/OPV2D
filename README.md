@@ -9,7 +9,7 @@ The website now serves the **2026-10-28 curated snapshot** on three pages:
 | [Indoor photovoltaics](https://sunyrain.github.io/OPV2D/indoor.html) | 1,678 | 166 | All indoor records |
 
 The binary/ternary default view excludes known incompatible conditions and
-retains records with incomplete conditions under an explicit label. The
+retains records with incomplete conditions, without per-record scope badges. The
 **conditions documented** filter requires explicit composition, organic scope,
 experimental measurement, single junction, AM1.5G, 100 mW/cm² and area <1 cm²:
 110 binary and 202 ternary observations currently satisfy all these fields.

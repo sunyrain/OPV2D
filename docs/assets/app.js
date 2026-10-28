@@ -1,4 +1,4 @@
-import { classicShell, classicStats, loadPageViews } from './classic-shell.js?v=20261028-classic';
+import { classicShell, classicStats, loadPageViews } from './classic-shell.js?v=20261028-scope-display';
 const topic = document.body.dataset.topic;
 const indoor = topic === 'indoor';
 const ternary = topic === 'ternary';
@@ -19,12 +19,6 @@ let manifest, allRows = [], filtered = [], currentPage = 1, pageSize = 100, sort
 let dictionary, detailRecord, activeDetailId, loadError = '', ready = false, searchTimer;
 const chunks = new Map();
 
-function scopeLabel(value) {
-  return ({ documented: t('标准条件齐全', 'Conditions documented'), unresolved: t('条件待补齐', 'Conditions incomplete'), outside: t('扩展条件', 'Extended conditions'), indoor: t('室内观测', 'Indoor observation') })[value] || value;
-}
-function badge(r) {
-  return `<span class="badge ${r.scope_status === 'unresolved' ? 'unknown' : r.scope_status === 'outside' ? 'outside' : ''}">${esc(scopeLabel(r.scope_status))}</span>`;
-}
 function statGroup(value) {
   const s = String(value || '').toLowerCase();
   // Explicit PCE labels only; reported/unknown values are never assumed to be champions.
@@ -125,7 +119,7 @@ function bind() {
     const button = e.target.closest('[data-sort]');
     if (!button) return;
     const key = button.dataset.sort;
-    sortDirection = key === sortKey ? -sortDirection : ['materials', 'doi', 'scope_status', 'statistic', 'light'].includes(key) ? 1 : -1;
+    sortDirection = key === sortKey ? -sortDirection : ['materials', 'doi', 'statistic', 'light'].includes(key) ? 1 : -1;
     sortKey = key;
     currentPage = 1;
     sortRows(); renderTable();
@@ -192,8 +186,8 @@ function columns() {
   const materials = ternary ? [['component_1',t('组分 1','Component 1'),''],['component_2',t('组分 2','Component 2'),''],['component_3',t('组分 3','Component 3'),''],['ratio',t('配比','Ratio'),'']] : [['donor',t('给体','Donor'),''],['acceptor',t('受体','Acceptor'),'']];
   const metrics = [['pce','PCE','%'],['voc','Voc','V'],['jsc','Jsc',jscUnit],['ff','FF','%']];
   const detail = ['detail',t('详情','Details'),''];
-  if (topic === 'binary') return [['layer',t('数据层','Layer'),''],...source,...materials,...metrics,['pce_error',t('PCE 公式偏差','PCE error'),'%'],['has_smiles','SMILES',''],['device_type',t('器件','Device'),''],['solvent',t('溶剂','Solvent'),''],['additive',t('添加剂','Additive'),''],['scope_status',t('范围','Scope'),''],detail];
-  if (ternary) return [['scope_status',t('范围','Scope'),''],...source,...materials,...metrics,['statistic',t('统计口径','Statistic'),''],['area',t('面积','Area'),'cm²'],['solvent',t('溶剂','Solvent'),''],detail];
+  if (topic === 'binary') return [['layer',t('数据层','Layer'),''],...source,...materials,...metrics,['pce_error',t('PCE 公式偏差','PCE error'),'%'],['has_smiles','SMILES',''],['device_type',t('器件','Device'),''],['solvent',t('溶剂','Solvent'),''],['additive',t('添加剂','Additive'),''],detail];
+  if (ternary) return [...source,...materials,...metrics,['statistic',t('统计口径','Statistic'),''],['area',t('面积','Area'),'cm²'],['solvent',t('溶剂','Solvent'),''],detail];
   return [['composition',t('体系','Composition'),''],...source,...materials,['light',t('灯源 / 色温','Light / CCT'),'K'],['lux',t('照度','Illuminance'),'lx'],['irradiance',t('辐照度','Irradiance'),irradianceUnit],...metrics,['area',t('面积','Area'),'cm²'],['statistic',t('统计口径','Statistic'),''],['device_type',t('器件','Device'),''],detail];
 }
 
@@ -225,7 +219,6 @@ function cell(r, key) {
   if (key === 'materials') return `<span class="material-name" title="${esc(r.materials.join(' : '))}">${esc(r.materials.join(' : '))}</span><div class="material-sub" title="${esc(r.ratio || '')}">${r.ratio ? esc(r.ratio) : r.system ? esc(r.system.toUpperCase()) : t('配比未说明', 'Ratio unspecified')}</div>`;
   if (key === 'pce') return `<span class="pce-value">${num(r.pce)}</span>`;
   if (key === 'statistic') return `<span class="statistic-badge" title="${esc(r.statistic)}">${esc(statLabel(r.statistic))}</span>`;
-  if (key === 'scope_status') return badge(r);
   if (key === 'doi') return doiLink(r.doi);
   if (key === 'light') return `<span class="light-cell">${esc(r.light || '—')}<small>${r.cct ? num(r.cct) + ' K' : ''}</small></span>`;
   if (key === 'detail') return `<button type="button" class="row-details" data-detail="${esc(r.id)}" aria-label="${esc(t('查看记录 ', 'Open observation ') + r.id)}">${t('查看', 'View')} ↗</button>`;
@@ -286,7 +279,7 @@ async function openDetail(row) {
     if (activeDetailId !== row.id || !$('detail-modal').open) return;
     detailRecord = chunks.get(row.detail_chunk)[row.id];
     if (!detailRecord) throw new Error('Missing record');
-    $('detail-body').innerHTML = `<div class="detail-head"><div><h3>${esc(row.materials.join(' : '))}</h3><p>${doiLink(row.doi)}</p></div>${badge(row)}</div>
+    $('detail-body').innerHTML = `<div class="detail-head"><div><h3>${esc(row.materials.join(' : '))}</h3><p>${doiLink(row.doi)}</p></div></div>
       <div class="detail-metrics">${[['pce','PCE','%'],['voc','Vₒ꜀','V'],['jsc','Jₛ꜀',jscUnit],['ff','FF','%']].map(([k,l,u]) => `<div><span>${l} · ${u}</span><strong>${num(row[k])}</strong></div>`).join('')}</div>
       <p class="detail-note">${t('报告统计口径：', 'Reported statistic: ')}${esc(statLabel(row.statistic))}。${t('逐指标定义见 metric_statistics；缺失条件不作推断，数值齐全不代表口径一致或人工核验。', 'See metric_statistics for per-metric definitions. Missing conditions are not inferred; numeric completeness is not statistical consistency or human validation.')}</p>
       <div class="section-heading"><h3>${t('已保存字段', 'Populated fields')}</h3><button class="btn-outline" id="download-record" type="button">${t('下载此记录 JSON', 'Download record JSON')}</button></div>
@@ -305,8 +298,8 @@ async function openDetail(row) {
 function renderFields() {
   const query = $('detail-search').value.trim().toLowerCase();
   const definitions = new Map(dictionary.filter(f => f.topic === topic).map(f => [f.field, f]));
-  const priority = ['doi','origin_doi','extraction_doi','source_doi','source_table','source_row','statistic','metric_statistics','website_scope_status','website_scope_reasons','remaining_issues'];
-  const fields = Object.entries(detailRecord).filter(([k,v]) => `${k} ${definitions.get(k)?.description_zh || ''} ${JSON.stringify(v)}`.toLowerCase().includes(query));
+  const priority = ['doi','origin_doi','extraction_doi','source_doi','source_table','source_row','statistic','metric_statistics','remaining_issues'];
+  const fields = Object.entries(detailRecord).filter(([k,v]) => !['website_scope_status','website_scope_reasons'].includes(k) && `${k} ${definitions.get(k)?.description_zh || ''} ${JSON.stringify(v)}`.toLowerCase().includes(query));
   fields.sort(([a],[b]) => (priority.includes(a) ? priority.indexOf(a) - 1000 : 0) - (priority.includes(b) ? priority.indexOf(b) - 1000 : 0));
   $('detail-fields').innerHTML = fields.length ? fields.map(([key, value]) => {
     const def = definitions.get(key);
