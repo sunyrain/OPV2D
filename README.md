@@ -35,6 +35,17 @@ preserved at [archive-v1.1.0.html](https://sunyrain.github.io/OPV2D/archive-v1.1
 GitHub Pages serves `main:/docs`. The new pages share `docs/assets/app.js` and
 `app.css`, with data in `docs/data` and downloads in `docs/downloads`.
 No runtime third-party scripts or build service are required.
+The existing page-view counter is optional and does not block data loading.
+
+The visual layout follows the original v1.1.0 browser: dark header, six compact
+statistics cards, horizontal filter toolbar, two summary-bar panels, dense
+DOI/material columns and the original related-work footer. Topic navigation and
+topic-specific columns are added within that layout. The binary page also
+retains strict-performance / strict-molecular filters, PCE-difference buckets,
+SMILES search and process-metadata filters. The strict subsets use the curated
+baseline-compatible membership (27,936 and 19,447 records respectively), not a
+claim that every member was newly source-verified. The default interface language
+is English, with a Chinese switch and saved language preference.
 
 Regenerate the public data from the final curated CSV exports:
 

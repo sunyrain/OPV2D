@@ -32,6 +32,8 @@ PRIVATE_KEYS = {
 PRIVATE_PREFIX = ("astra_", "reextraction_", "baseline_", "strict_", "primary_source_evidence", "metric_statistics_evidence", "metric_statistics_semantic")
 PATH_RE = re.compile(r"(?:[A-Za-z]:[\\/]|/Users/|/home/|source_packets|sent_sources|sk-[A-Za-z0-9]{20,})", re.I)
 INDEX_FIELDS = ["id", "doi", "year", "materials", "composition", "system", "pce", "voc", "jsc", "ff", "statistic", "scope_status", "scope_reasons", "area", "spectrum", "irradiance", "lux", "light", "cct", "quartet", "has_smiles", "solvent", "device", "issue_count", "detail_chunk", "source_table", "ratio"]
+CLASSIC_FIELDS = ["donor", "acceptor", "donor_smiles", "acceptor_smiles", "device_type", "additive", "thickness", "annealing", "has_structure", "pce_error", "strict_performance", "strict_molecular"]
+INDEX_FIELDS += CLASSIC_FIELDS
 
 
 def filled(v):
@@ -191,6 +193,18 @@ def build(source, output):
                 first(r, "solvent_canonical", "solvent") or processing.get("solvent"), first(r, "device_structure", "device_stack", "device_kind", "device_type"),
                 len(issues) if isinstance(issues, (list, dict)) else (1 if filled(issues) else 0), i // 500,
                 r.get("source_table"), first(r, "ratio_raw", "d_a_ratio") ]))
+            row.update(
+                donor=first(r, "donor_canonical", "donor"), acceptor=first(r, "acceptor_canonical", "acceptor"),
+                donor_smiles=r.get("donor_smiles"), acceptor_smiles=r.get("acceptor_smiles"),
+                device_type=first(r, "device_type", "device_kind"),
+                additive=first(r, "additive_canonical", "additive", "processing_additive") or processing.get("additive"),
+                thickness=first(r, "active_layer_thickness", "active_layer_thickness_nm") or processing.get("active_layer_thickness_nm"),
+                annealing=first(r, "annealing_temp", "annealing_temperature_c", "annealing_temp_c") or processing.get("annealing_temp_c") or processing.get("annealing_temperature_c"),
+                has_structure=bool(first(r, "device_structure", "device_stack")),
+                pce_error=number(r.get("pce_relative_error_percent")) if topic == "binary" else None,
+                strict_performance=str(raw.get("baseline_compatible_strict_performance_member", "")).lower() == "true",
+                strict_molecular=str(raw.get("baseline_compatible_strict_molecular_member", "")).lower() == "true",
+            )
             indices.append([row.get(k) for k in INDEX_FIELDS])
         assert len({row[0] for row in indices}) == len(indices), f"Duplicate IDs in {topic}"
         for offset in range(0, len(public_rows), 500):
@@ -208,6 +222,10 @@ def build(source, output):
             "lux_reported": sum(r[INDEX_FIELDS.index("lux")] is not None for r in indices),
             "fields": len(fields), "browser_bytes": (data_dir / f"{topic}.json").stat().st_size,
             "csv_bytes": (downloads / f"{topic}.csv").stat().st_size, "json_bytes": (downloads / f"{topic}.json").stat().st_size}
+        stats.update({
+            key: sum(bool(row[INDEX_FIELDS.index(key)]) for row in indices)
+            for key in ["strict_performance", "strict_molecular", "has_smiles", "has_structure"]
+        })
         manifest["topics"][topic] = stats
         for entry in dictionary:
             if entry["dataset"] == original and entry["field"] in field_set:

@@ -1,5 +1,12 @@
 # Three-topic website update — 2026-10-28
 
+The original v1.1.0 visual layout has been restored at the author's request.
+Its stylesheet is retained in `docs/assets/classic.css`; `classic-shell.js`
+adapts the original structure to the three topics. The six cards, filter toolbar,
+paired summary charts, compact source/material columns, record detail cards,
+page-view counter and related-work footer are retained. Data downloads and
+scientific record values are unchanged by this layout restoration.
+
 The single-table homepage is replaced by separate standard-binary,
 standard-ternary and indoor-photovoltaic pages, using the final curated exports.
 Original measurements and source IDs are preserved. New website scope flags
