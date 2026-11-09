@@ -1,4 +1,4 @@
-import { classicShell, classicStats, loadPageViews } from './classic-shell.js?v=20261028-scope-display';
+import { classicShell, classicStats, loadPageViews } from './classic-shell.js?v=20261110-v2';
 const topic = document.body.dataset.topic;
 const indoor = topic === 'indoor';
 const ternary = topic === 'ternary';
@@ -71,8 +71,8 @@ function renderSummaryBars() {
     [t('全部室内记录','All indoor records'),total,'blue'],[t('二元','Binary'),count(r=>r.composition==='binary'),'teal'],
     [t('三元','Ternary'),count(r=>r.composition==='ternary'),'green'],[t('其他体系','Other compositions'),count(r=>!['binary','ternary'].includes(r.composition)),'amber']
   ] : [
-    [t('完整专题','Full topic'),total,'blue'],[t('标准范围','Standard scope'),total-(s.scope.outside||0),'teal'],
-    [t('标准条件齐全','Conditions documented'),s.scope.documented||0,'green'],[t('扩展条件','Extended conditions'),s.scope.outside||0,'amber']
+    [t('完整专题','Full topic'),total,'blue'],[t('三组分名称齐全','Three component names'),s.three_names,'teal'],
+    [t('三组分角色齐全','Three component roles'),s.three_roles,'green'],[t('组分配比','Composition ratio'),s.composition_ratio,'amber']
   ];
   const quality = topic === 'binary' ? [
     [t('PCE 公式偏差 ≤2%','PCE error ≤2%'),count(r=>r.pce_error!==null&&r.pce_error<=2),'green'],
@@ -147,7 +147,6 @@ function applyFilters(resetPage = true) {
     if (terms.some(term => !r.searchText.includes(term))) return false;
     if (!indoor && f.view !== 'all') {
       if (f.view === 'strict_performance' || f.view === 'strict_molecular') { if (!r[f.view]) return false; }
-      else if (f.view === 'scope' ? r.scope_status === 'outside' : r.scope_status !== f.view) return false;
     }
     if (indoor && f.view !== 'all' && (f.view === 'other' ? ['binary', 'ternary'].includes(r.composition) : r.composition !== f.view)) return false;
     if (f.statistic !== 'all' && statGroup(r.statistic) !== f.statistic) return false;
@@ -236,7 +235,7 @@ async function load() {
   $('load-state').className = 'loading';
   $('load-state').textContent = t('正在载入本专题数据…', 'Loading this topic…');
   try {
-    const [meta, payload] = await Promise.all([getJSON('data/manifest.json?v=20261028-classic'), getJSON(`data/${topic}.json?v=20261028-classic`)]);
+    const [meta, payload] = await Promise.all([getJSON('data/manifest.json?v=20261110-v2'), getJSON(`data/${topic}.json?v=20261110-v2`)]);
     manifest = meta;
     allRows = payload.rows.map(values => {
       const r = Object.fromEntries(payload.fields.map((field, i) => [field, values[i]]));
@@ -274,14 +273,14 @@ async function openDetail(row) {
   $('detail-body').innerHTML = `<p class="loading">${t('载入原始字段…', 'Loading record fields…')}</p>`;
   $('detail-modal').showModal();
   try {
-    if (!chunks.has(row.detail_chunk)) chunks.set(row.detail_chunk, await getJSON(`data/details/${topic}/${row.detail_chunk}.json?v=20261028-classic`));
-    if (!dictionary) dictionary = await getJSON('data/dictionary.json?v=20261028-classic');
+    if (!chunks.has(row.detail_chunk)) chunks.set(row.detail_chunk, await getJSON(`data/details/${topic}/${row.detail_chunk}.json?v=20261110-v2`));
+    if (!dictionary) dictionary = await getJSON('data/dictionary.json?v=20261110-v2');
     if (activeDetailId !== row.id || !$('detail-modal').open) return;
     detailRecord = chunks.get(row.detail_chunk)[row.id];
     if (!detailRecord) throw new Error('Missing record');
     $('detail-body').innerHTML = `<div class="detail-head"><div><h3>${esc(row.materials.join(' : '))}</h3><p>${doiLink(row.doi)}</p></div></div>
       <div class="detail-metrics">${[['pce','PCE','%'],['voc','Vₒ꜀','V'],['jsc','Jₛ꜀',jscUnit],['ff','FF','%']].map(([k,l,u]) => `<div><span>${l} · ${u}</span><strong>${num(row[k])}</strong></div>`).join('')}</div>
-      <p class="detail-note">${t('报告统计口径：', 'Reported statistic: ')}${esc(statLabel(row.statistic))}。${t('逐指标定义见 metric_statistics；缺失条件不作推断，数值齐全不代表口径一致或人工核验。', 'See metric_statistics for per-metric definitions. Missing conditions are not inferred; numeric completeness is not statistical consistency or human validation.')}</p>
+      <p class="detail-note">${t('报告统计口径：', 'Reported statistic: ')}${esc(statLabel(row.statistic))}。${t('逐指标统计定义与来源说明见下方字段。', 'Per-metric statistics and source notes are provided in the fields below.')}</p>
       <div class="section-heading"><h3>${t('已保存字段', 'Populated fields')}</h3><button class="btn-outline" id="download-record" type="button">${t('下载此记录 JSON', 'Download record JSON')}</button></div>
       <div class="field field-search"><label for="detail-search">${t('筛选字段', 'Filter fields')}</label><input id="detail-search" type="search" placeholder="${t('如：面积、溶剂、metric_statistics', 'e.g. area, solvent, metric_statistics')}"></div><dl id="detail-fields" class="detail-fields"></dl>`;
     renderFields();
@@ -299,11 +298,11 @@ function renderFields() {
   const query = $('detail-search').value.trim().toLowerCase();
   const definitions = new Map(dictionary.filter(f => f.topic === topic).map(f => [f.field, f]));
   const priority = ['doi','origin_doi','extraction_doi','source_doi','source_table','source_row','statistic','metric_statistics','remaining_issues'];
-  const fields = Object.entries(detailRecord).filter(([k,v]) => !['website_scope_status','website_scope_reasons'].includes(k) && `${k} ${definitions.get(k)?.description_zh || ''} ${JSON.stringify(v)}`.toLowerCase().includes(query));
+  const fields = Object.entries(detailRecord).filter(([k,v]) => !['website_scope_status','website_scope_reasons'].includes(k) && `${k} ${definitions.get(k)?.description_zh || definitions.get(k)?.description_en || ''} ${JSON.stringify(v)}`.toLowerCase().includes(query));
   fields.sort(([a],[b]) => (priority.includes(a) ? priority.indexOf(a) - 1000 : 0) - (priority.includes(b) ? priority.indexOf(b) - 1000 : 0));
   $('detail-fields').innerHTML = fields.length ? fields.map(([key, value]) => {
     const def = definitions.get(key);
-    const description = language === 'zh' ? def?.description_zh : def?.unit ? `Unit: ${def.unit}` : '';
+    const description = [language === 'zh' ? (def?.description_zh || def?.description_en) : def?.description_en, def?.unit ? `${t('单位', 'Unit')}: ${def.unit}` : ''].filter(Boolean).join(' · ');
     const formatted = typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value);
     return `<div class="detail-field ${typeof value === 'object' || formatted.length > 160 ? 'wide' : ''}"><dt>${esc(key)}${description ? `<small>${esc(description)}</small>` : ''}</dt><dd class="${typeof value === 'object' ? 'json' : ''}">${key.endsWith('doi') || key === 'doi' ? doiLink(formatted) : esc(formatted)}</dd></div>`;
   }).join('') : `<p class="empty">${t('没有匹配字段。', 'No matching fields.')}</p>`;
@@ -315,10 +314,10 @@ function csvCell(value) {
   return '"' + str.replaceAll('"', '""') + '"';
 }
 function exportFiltered() {
-  const fields = ['id','doi','year','donor','acceptor','donor_smiles','acceptor_smiles','materials','composition','system','pce','voc','jsc','ff','statistic','scope_status','scope_reasons','area','spectrum','irradiance','lux','light','cct','source_table','ratio','device_type','solvent','additive','thickness','annealing','pce_error','strict_performance','strict_molecular'];
+  const fields = ['id','doi','year','donor','acceptor','donor_smiles','acceptor_smiles','materials','composition','system','pce','voc','jsc','ff','statistic','area','spectrum','irradiance','lux','light','cct','source_table','ratio','device_type','solvent','additive','thickness','annealing','pce_error','strict_performance','strict_molecular'];
   const headers = fields.map(k => ({ pce:'pce_percent', voc:'voc_v', jsc: indoor ? 'jsc_ua_cm2' : 'jsc_ma_cm2', ff:'ff_percent', area:'display_area_cm2', irradiance: indoor ? 'irradiance_uw_cm2' : 'irradiance_mw_cm2', lux:'illuminance_lux', cct:'cct_k' })[k] || k);
   const content = '\ufeff' + [headers.map(csvCell).join(','), ...filtered.map(r => fields.map(k => csvCell(r[k])).join(','))].join('\r\n');
-  download(new Blob([content], { type:'text/csv;charset=utf-8' }), `OPV-${topic}-filtered-20261028.csv`);
+  download(new Blob([content], { type:'text/csv;charset=utf-8' }), `OPV-${topic}-filtered-v2.0.0.csv`);
 }
 function download(blob, name) {
   const url = URL.createObjectURL(blob), a = document.createElement('a');

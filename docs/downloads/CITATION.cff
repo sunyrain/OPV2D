@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: Please cite this dataset and its version-specific DOI shown on Zenodo.
+type: dataset
+title: "OPV-DB: a literature-mined organic photovoltaic device performance dataset"
+version: 2.0.0
+doi: "10.5281/zenodo.23951239"
+date-released: "2026-11-04"
+license: CC-BY-4.0
+authors:
+  - family-names: Qiu
+    given-names: Jiangjie
+    affiliation: "Tsinghua University"
+    orcid: "https://orcid.org/0009-0002-3658-4733"
+  - family-names: Yang
+    given-names: Xuan
+    affiliation: "Tsinghua University"
+    orcid: "https://orcid.org/0009-0009-5925-5706"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.20841542"
+    description: "Concept DOI for all OPV-DB versions"
+url: "https://doi.org/10.5281/zenodo.23951239"
+abstract: "Standard-binary organic photovoltaic observations, linked additional information, strict binary subsets, a ternary-photovoltaic collection, an indoor-photovoltaic collection, and material-reference data."

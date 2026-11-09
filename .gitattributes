@@ -2,3 +2,4 @@
 *.html text eol=lf
 Active_Database.csv -text
 docs/opv_data.json -text
+docs/downloads/** -text

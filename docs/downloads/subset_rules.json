@@ -1,0 +1,92 @@
+{
+  "dataset_version": "2.0.0",
+  "input": "data/binary.csv",
+  "outputs": {
+    "strict_performance": "data/binary_strict_performance.csv",
+    "strict_molecular": "data/binary_strict_molecular.csv"
+  },
+  "records": {
+    "binary": 32778,
+    "strict_performance": 27863,
+    "strict_molecular": 19299
+  },
+  "schema": "Both subsets preserve all 37 binary columns and their original values. They are nested views, not additional observations.",
+  "missing_tokens": [
+    "",
+    "[]",
+    "{}",
+    "n/a",
+    "na",
+    "nan",
+    "none",
+    "not reported",
+    "null",
+    "unknown"
+  ],
+  "required_nonempty_fields": [
+    "doi_norm",
+    "donor",
+    "acceptor"
+  ],
+  "required_finite_numeric_fields": [
+    "voc",
+    "jsc",
+    "ff",
+    "pce"
+  ],
+  "ff_normalization": "For the consistency calculation, multiply FF by 100 if FF <= 1.5; the exported source value is unchanged.",
+  "physical_ranges": {
+    "pce": {
+      "min_exclusive": 0,
+      "max_inclusive": 30
+    },
+    "voc": {
+      "min_inclusive": 0,
+      "max_inclusive": 2
+    },
+    "jsc": {
+      "min_inclusive": 0,
+      "max_inclusive": 50
+    },
+    "normalized_ff": {
+      "min_inclusive": 0,
+      "max_inclusive": 100
+    }
+  },
+  "consistency": {
+    "nominal_irradiance_mw_cm2": 100,
+    "calculated_pce_percent": "voc * jsc * normalized_ff / 100",
+    "absolute_relative_difference_percent": "100 * abs(calculated_pce_percent - pce) / abs(pce)",
+    "maximum_relative_difference_percent": 2,
+    "note": "Nominal irradiance is an analysis convention, not a recovered measurement for every row. Calculations use unrounded parsed input values."
+  },
+  "duplicate_selection": {
+    "after": "Required fields, physical ranges and consistency selection",
+    "reported_key": [
+      "donor",
+      "acceptor",
+      "doi_norm",
+      "voc",
+      "jsc",
+      "ff",
+      "pce"
+    ],
+    "canonical_key": [
+      "donor_canonical",
+      "acceptor_canonical",
+      "doi_norm",
+      "voc",
+      "jsc",
+      "ff",
+      "pce"
+    ],
+    "key_encoding": "Exact stripped cell strings. A missing canonical material label falls back to the reported label. DOI is normalized from doi.",
+    "retention_order": "Numeric record IDs first, in ascending numeric order; nonnumeric IDs then in lexical order. Retain a candidate only if neither its reported nor canonical key has already been retained.",
+    "scope": "This subset rule does not include preparation conditions and is distinct from source-based deduplication of the primary collection."
+  },
+  "strict_molecular_additional_requirement": [
+    "donor_smiles",
+    "acceptor_smiles"
+  ],
+  "interpretation": "SMILES must be nonempty under the missing-token convention. Subset membership does not certify chemical identity or provide independent extraction-accuracy validation."
+}
